@@ -1,4 +1,9 @@
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+  useMemo
+} from "react";
 import {
   Card,
   Tag,
@@ -28,7 +33,14 @@ import TaskDetailsDrawer from "./TaskDetailsDrawer";
 const { Title, Text } = Typography;
 const { Option } = Select;
 
-const STATUS_ORDER = ["To Do", "In Progress", "Review", "Completed", "Overdue"];
+const STATUS_ORDER = [
+  "To Do",
+  "In Progress",
+  "Review",
+  "Completed",
+  "Overdue"
+];
+
 const STATUS_COLORS = {
   "To Do": "red",
   "In Progress": "orange",
@@ -39,7 +51,7 @@ const STATUS_COLORS = {
 
 const TaskBoard = () => {
   /* ================= STATE ================= */
-  const [tasks, setTasks] = useState([]); // ✅ ALWAYS ARRAY
+  const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const [search, setSearch] = useState("");
@@ -59,10 +71,12 @@ const TaskBoard = () => {
       name: "Unknown"
     };
 
-  const isPrivileged =
-    ["Admin", "Superadmin", "SuperAdmin", "Team Leader"].includes(
-      currentUser.role
-    );
+  const isPrivileged = [
+    "Admin",
+    "Superadmin",
+    "SuperAdmin",
+    "Team Leader"
+  ].includes(currentUser.role);
 
   /* ================= USERS ================= */
   const fetchUsers = useCallback(async () => {
@@ -78,7 +92,7 @@ const TaskBoard = () => {
     fetchUsers();
   }, [fetchUsers]);
 
-  /* ================= TASKS (SAFE) ================= */
+  /* ================= TASKS ================= */
   const fetchTasks = useCallback(
     async (opts = {}) => {
       setLoading(true);
@@ -98,25 +112,42 @@ const TaskBoard = () => {
         if (qStatus) params.append("status", qStatus);
         if (qSearch) params.append("search", qSearch);
 
-        const res = await axios.get(`/api/tasks?${params.toString()}`);
+        const res = await axios.get(
+          `/api/tasks?${params.toString()}`
+        );
 
-        // ✅ ABSOLUTE SAFETY
-        const safeTasks = Array.isArray(res.data)
+        const rawTasks = Array.isArray(res.data)
           ? res.data
           : Array.isArray(res.data?.tasks)
           ? res.data.tasks
           : [];
 
-        setTasks(safeTasks);
+        /* 🔥 IMPORTANT FIX — NORMALIZE assignedTo */
+        const normalizedTasks = rawTasks.map((t) => ({
+          ...t,
+          assignedTo: Array.isArray(t.assignedTo)
+            ? t.assignedTo
+            : t.assignedTo
+            ? [t.assignedTo]
+            : []
+        }));
+
+        setTasks(normalizedTasks);
       } catch (e) {
         console.error(e);
         message.error("Failed to load tasks");
-        setTasks([]); // ✅ NEVER BREAK
+        setTasks([]);
       } finally {
         setLoading(false);
       }
     },
-    [search, filterStatus, filterAssignedTo, currentUser._id, isPrivileged]
+    [
+      search,
+      filterStatus,
+      filterAssignedTo,
+      currentUser._id,
+      isPrivileged
+    ]
   );
 
   useEffect(() => {
@@ -134,22 +165,22 @@ const TaskBoard = () => {
     return () => clearTimeout(t);
   }, [search, filterStatus, filterAssignedTo, fetchTasks]);
 
-  /* ================= GROUP TASKS (SAFE) ================= */
+  /* ================= GROUP ================= */
   const grouped = useMemo(() => {
-    const grouped = {};
-    STATUS_ORDER.forEach((s) => (grouped[s] = []));
+    const g = {};
+    STATUS_ORDER.forEach((s) => (g[s] = []));
 
-    (Array.isArray(tasks) ? tasks : []).forEach((t) => {
+    tasks.forEach((t) => {
       const overdue =
         t.dueDate &&
         moment(t.dueDate).isBefore(moment(), "day") &&
         t.status !== "Completed";
 
       const key = overdue ? "Overdue" : t.status || "To Do";
-      grouped[key].push(t);
+      g[key].push(t);
     });
 
-    return grouped;
+    return g;
   }, [tasks]);
 
   /* ================= DRAG ================= */
@@ -167,7 +198,9 @@ const TaskBoard = () => {
         : destination.droppableId;
 
     try {
-      await axios.put(`/api/tasks/${draggableId}`, { status: newStatus });
+      await axios.put(`/api/tasks/${draggableId}`, {
+        status: newStatus
+      });
       fetchTasks();
     } catch {
       message.error("Failed to update task");
@@ -255,7 +288,10 @@ const TaskBoard = () => {
                     <Space>
                       <Title
                         level={5}
-                        style={{ margin: 0, color: STATUS_COLORS[status] }}
+                        style={{
+                          margin: 0,
+                          color: STATUS_COLORS[status]
+                        }}
                       >
                         {status}
                       </Title>
@@ -368,7 +404,7 @@ const TaskCard = ({ task, onClick }) => (
       }}
     >
       <Avatar.Group maxCount={4} size="small">
-        {task.assignedTo?.map((u) => (
+        {task.assignedTo.map((u) => (
           <Tooltip title={u.name} key={u._id}>
             <Avatar src={u.profileImage || undefined}>
               {u.name?.charAt(0)?.toUpperCase()}
@@ -390,4 +426,3 @@ const TaskCard = ({ task, onClick }) => (
 );
 
 export default TaskBoard;
-                                  
