@@ -1,0 +1,113 @@
+/* Root card */
+.ios-attachment-card {
+  width: 100%;
+  max-width: 100%;
+  background: rgba(28, 28, 30, 0.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-radius: 16px;
+  padding: 12px;
+  margin-bottom: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ios-attachment-card:active {
+  transform: scale(0.98);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Header */
+.ios-attachment-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Icons */
+.file-icon {
+  font-size: 30px;
+}
+
+.file-icon.pdf {
+  color: #ff453a;
+}
+
+.file-icon.image {
+  color: #32d74b;
+}
+
+.file-icon.other {
+  color: #0a84ff;
+}
+
+/* File meta */
+.ios-file-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.ios-file-name {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Open link */
+.ios-download-link {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: #64d2ff;
+  text-decoration: none;
+}
+
+.ios-download-link:active {
+  opacity: 0.7;
+}
+
+/* Image preview */
+.ios-image-preview {
+  width: 100%;
+  margin-top: 10px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+/* PDF preview */
+.ios-pdf-preview {
+  width: 100%;
+  height: 240px;
+  margin-top: 10px;
+  border-radius: 12px;
+  border: none;
+  background: #fff;
+}
+
+/* DOC note */
+.ios-doc-note {
+  display: block;
+  margin-top: 10px;
+  font-size: 12px;
+  color: #c7c7cc;
+}
+
+/* Mobile optimizations */
+@media (max-width: 480px) {
+  .ios-attachment-card {
+    padding: 10px;
+    border-radius: 14px;
+  }
+
+  .ios-pdf-preview {
+    height: 200px;
+  }
+
+  .file-icon {
+    font-size: 26px;
+  }
+}

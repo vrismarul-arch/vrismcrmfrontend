@@ -11,7 +11,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import ContextMenu from "./ContextMenu";
 import AttachmentRenderer from "./AttachmentRenderer";
 import { uploadFile } from "../../utils/fileStorage";
-import UserList from "./UserList"; 
+import UserList from "./UserList";
 import "./chat.css";
 import chat from "./chat.png";
 
@@ -255,7 +255,7 @@ export default function DesktopChat() {
             [data.from]: (p[data.from] || 0) + 1
           }));
         } else {
-          axios.post("/api/chat/read", { from: data.from, to: data.to }).catch(() => {});
+          axios.post("/api/chat/read", { from: data.from, to: data.to }).catch(() => { });
         }
       }
 
@@ -313,30 +313,30 @@ export default function DesktopChat() {
 
       {/* CHAT PANEL */}
       <div className="chat-panel">
-       <div className="chat-header">
-  {activeUser ? (
-    <>
-      {/* 1. Profile Image/Avatar */}
-      <div className="active-user-avatar">
-        {activeUser.profileImage ? (
-          <img
-            src={activeUser.profileImage}
-            alt={`${activeUser.name}'s avatar`}
-            className="active-profile-image"
-          />
-        ) : (
-          // Fallback to initial letter
-          activeUser.name?.charAt(0)
-        )}
-      </div>
-      {/* 2. User Name */}
-      👋 {activeUser.name}
-    </>
-  ) : (
-    // State when no user is selected
-    <>👋 Select a user</>
-  )}
-</div>
+        <div className="chat-header">
+          {activeUser ? (
+            <>
+              {/* 1. Profile Image/Avatar */}
+              <div className="active-user-avatar">
+                {activeUser.profileImage ? (
+                  <img
+                    src={activeUser.profileImage}
+                    alt={`${activeUser.name}'s avatar`}
+                    className="active-profile-image"
+                  />
+                ) : (
+                  // Fallback to initial letter
+                  activeUser.name?.charAt(0)
+                )}
+              </div>
+              {/* 2. User Name */}
+              👋 {activeUser.name}
+            </>
+          ) : (
+            // State when no user is selected
+            <>👋 Select a user</>
+          )}
+        </div>
 
         {!activeUser && (
           <div className="empty-state">
@@ -356,9 +356,8 @@ export default function DesktopChat() {
                 return (
                   <div
                     key={msg._id}
-                    className={`bubble-row ${mine ? "right" : "left"} ${
-                      selectedIds.includes(msg._id) ? "selected" : ""
-                    }`}
+                    className={`bubble-row ${mine ? "right" : "left"} ${selectedIds.includes(msg._id) ? "selected" : ""
+                      }`}
                     onContextMenu={(e) => onRightClick(e, msg)}
                     onTouchStart={(e) => startLongPress(e, msg)}
                     onTouchEnd={cancelLongPress}
@@ -379,9 +378,8 @@ export default function DesktopChat() {
 
                         {mine && (
                           <div
-                            className={`read-indicator ${
-                              msg.read ? "read" : "delivered"
-                            }`}
+                            className={`read-indicator ${msg.read ? "read" : "delivered"
+                              }`}
                           >
                             {msg.read ? "✓✓" : "✓"}
                           </div>

@@ -132,7 +132,7 @@ const BrandService = () => {
           </Tooltip>
 
           {/* ⭐ Workflow Button Added ⭐ */}
-          {/* <Tooltip title="Workflow Builder">
+          <Tooltip title="Workflow Builder">
             <Button
               type="text"
               icon={<BranchesOutlined style={{ color: "#0E2B43" }} />}
@@ -143,7 +143,7 @@ const BrandService = () => {
             >
               Flow
             </Button>
-          </Tooltip> */}
+          </Tooltip>
 
           <Popconfirm
             title="Delete service?"

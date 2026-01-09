@@ -101,7 +101,7 @@ const pdfStyles = {
     },
     fontSize: {
         companyName: 14,
-        isoText: 8,
+        taglineText: 9,
         addressText: 8,
         mainContent: 10,
         sectionTitle: 12,
@@ -154,22 +154,25 @@ export const downloadQuotationPdf = async (record) => {
             pdf.setFontSize(pdfStyles.fontSize.companyName);
             pdf.setTextColor(pdfStyles.colors.primary);
             pdf.setFont(pdfStyles.font.family, pdfStyles.font.bold);
-            pdf.text("MEGA CRANES INDIA PRIVATE LIMITED", pdfWidth / 2, pdfStyles.spacing.padding + 5, { align: "center" });
-            pdf.setFontSize(pdfStyles.fontSize.isoText);
+            pdf.text("VR INDUSTRIAL SOLUTIONS & MACHINERY", pdfWidth / 2, pdfStyles.spacing.padding + 5, { align: "center" });
+            pdf.setFontSize(pdfStyles.fontSize.taglineText);
             pdf.setTextColor(pdfStyles.colors.primary);
             pdf.setFont(pdfStyles.font.family, pdfStyles.font.normal);
-            pdf.text("(An ISO 9001 : 2015 Certified company)", pdfWidth / 2, pdfStyles.spacing.padding + 9, { align: "center" });
+            pdf.text("(Authorized Partner of Mega Cranes India Pvt Ltd)", pdfWidth / 2, pdfStyles.spacing.padding + 9, { align: "center" });
             pdf.setFontSize(pdfStyles.fontSize.addressText);
             pdf.setTextColor(pdfStyles.colors.text);
-            pdf.text("S.F. No. 2/8, 2/9, 2/11, Thelungupalayam Road, Ellapalayam (P.O), Annur, Coimbatore - 641 697.", pdfWidth / 2, pdfStyles.spacing.padding + 15, { align: "center" });
-            pdf.text("Mob : 99949 63033, 99949 93032.", pdfWidth / 2, pdfStyles.spacing.padding + 18, { align: "center" });
-            pdf.text("E-mail : info@megacranesindia.com, marketing@megacranesindia.com", pdfWidth / 2, pdfStyles.spacing.padding + 21, { align: "center" });
-            pdf.text("Website : www.megacranesindia.com", pdfWidth / 2, pdfStyles.spacing.padding + 24, { align: "center" });
-            pdf.text("GST No : 33AACCM6869G1Z8      PAN No : AACCM6869G      Incorporation No : U29150TZ2009PTC015678", pdfWidth / 2, pdfStyles.spacing.padding + 27, { align: "center" });
+            pdf.text("Factory Address: Plot No. 132, Surappa Gounder Street, Lakshmi Nagar,", pdfWidth / 2, pdfStyles.spacing.padding + 15, { align: "center" });
+            pdf.text("Vellalur, Coimbatore - 641111", pdfWidth / 2, pdfStyles.spacing.padding + 18, { align: "center" });
+            pdf.text("Office Address: 64/1, Balaji Nagar, Kalapatti Road, Saravanampatti,", pdfWidth / 2, pdfStyles.spacing.padding + 21, { align: "center" });
+            pdf.text("Coimbatore - 641035", pdfWidth / 2, pdfStyles.spacing.padding + 24, { align: "center" });
+            pdf.text("Mobile: 95004 76026, 90035 76026", pdfWidth / 2, pdfStyles.spacing.padding + 27, { align: "center" });
+            pdf.text("Email: info@vrism.in, sales@vrism.in", pdfWidth / 2, pdfStyles.spacing.padding + 30, { align: "center" });
+            pdf.text("Website: www.vrism.in", pdfWidth / 2, pdfStyles.spacing.padding + 33, { align: "center" });
+            pdf.text("GSTIN: 33BZRPS7627F1Z5", pdfWidth / 2, pdfStyles.spacing.padding + 36, { align: "center" });
             pdf.setDrawColor(pdfStyles.colors.primary);
             pdf.setLineWidth(pdfStyles.lines.header);
-            pdf.line(pdfStyles.spacing.padding, pdfStyles.spacing.padding + 32, pdfWidth - pdfStyles.spacing.padding, pdfStyles.spacing.padding + 32);
-            y = pdfStyles.spacing.padding + 40;
+            pdf.line(pdfStyles.spacing.padding, pdfStyles.spacing.padding + 40, pdfWidth - pdfStyles.spacing.padding, pdfStyles.spacing.padding + 40);
+            y = pdfStyles.spacing.padding + 45;
         };
 
         const addFooter = (pageNumber, totalPages) => {
@@ -202,7 +205,7 @@ export const downloadQuotationPdf = async (record) => {
             })(),
             reference: record.reference || `Your telecom enquiry dated ${new Date().toLocaleDateString("en-IN")}`,
             quotationDate: record.date ? new Date(record.date).toLocaleDateString("en-IN") : new Date().toLocaleDateString("en-IN"),
-            quotationNumber: record.quotationNumber || "MCIPL/OFR/0/NXL",
+            quotationNumber: record.quotationNumber || "VRISM/OFR/0/NXL",
             quotationNotes: record.quotationNotes || "If Installation or any other Service is required, additional charges of Rs.4,500/- will be Applicable extra on PER MAN DAY (i.e, Per Engineer Per Day) basis + GST 18% Extra. If required, you have to release a separate Work Order",
             customerScope: record.customerScope || `Transportation from our works to your site\nUnloading the materials @Site, Storage, Security, Inhouse Transportation\nRequired Cables, SFU, Ladders, Scaffoldings, Platforms, Cranes, Chain Block other requirements for Installation.\nInstallation with Required Base & Cables, Materials & Modifications\nAdditional Materials, Spares, Modifications & Services (if required)`,
             hsnCodes: record.hsnCodes || Array.from(new Set(
@@ -214,8 +217,8 @@ export const downloadQuotationPdf = async (record) => {
                 { label: "PAYMENT TERMS", value: record.ourPaymentTerms || "100% payment + 100% GST before dispatch from our works" },
                 { label: "DELIVERY", value: record.delivery || "4 - 6 weeks against receipt of your firm PO" },
                 { label: "PACKING & FORWARDING CHARGES", value: record.packingForwardingCharges || "NA" },
-                { label: "TRANSPORTATION CHARGES", value: record.transportationCharges || "Customer’s scope" },
-                { label: "TRANSPORTER NAME", value: record.transporterName || "Customer’s Vehicle" },
+                { label: "TRANSPORTATION CHARGES", value: record.transportationCharges || "Customer's scope" },
+                { label: "TRANSPORTER NAME", value: record.transporterName || "Customer's Vehicle" },
                 { label: "MODE & PLACE OF DELIVERY", value: record.modePlaceDelivery || "EX WORKS" },
                 { label: "VALIDITY", value: record.offerValidity || "30 days from the date of this offer." },
             ],
@@ -245,7 +248,7 @@ export const downloadQuotationPdf = async (record) => {
         pdf.setFont(pdfStyles.font.family, pdfStyles.font.normal);
         y += pdfStyles.spacing.lineHeight;
         pdf.text(`REF: ${quotationContent.reference}`, pdfStyles.spacing.padding, y);
-        pdf.text(`DATE: ${quotationContent.quotationDate}`, pdfWidth - pdfStyles.spacing.padding, pdfStyles.spacing.padding + 40, { align: "right" });
+        pdf.text(`DATE: ${quotationContent.quotationDate}`, pdfWidth - pdfStyles.spacing.padding, pdfStyles.spacing.padding + 45, { align: "right" });
         y += pdfStyles.spacing.lineHeight * 2;
         pdf.setFont(pdfStyles.font.family, pdfStyles.font.bold);
         pdf.text("Dear Customer,", pdfStyles.spacing.padding, y);
@@ -253,9 +256,9 @@ export const downloadQuotationPdf = async (record) => {
         pdf.setFont(pdfStyles.font.family, pdfStyles.font.normal);
         pdf.text("We thank you for enquiry, we are pleased to submit our Techno Commercial Offer, as under.", pdfStyles.spacing.padding, y, { maxWidth: pdfWidth - 2 * pdfStyles.spacing.padding });
         y += pdfStyles.spacing.lineHeight * 2;
-        pdf.text("We, “Mega Cranes” is a Promising & Reliable Original Equipment Manufacturer of Overhead Cranes and Electric Wire Rope Hoist in South India, situated at Coimbatore more than a decade.", pdfStyles.spacing.padding, y, { maxWidth: pdfWidth - 2 * pdfStyles.spacing.padding });
+        pdf.text("We, \"VR Industrial Solutions & Machinery\" is an Authorized Partner of \"Mega Cranes India Pvt Ltd\", a Promising & Reliable Original Equipment Manufacturer of Overhead Cranes and Electric Wire Rope Hoist in South India, situated at Coimbatore more than a decade.", pdfStyles.spacing.padding, y, { maxWidth: pdfWidth - 2 * pdfStyles.spacing.padding });
         y += pdfStyles.spacing.lineHeight * 2;
-        pdf.text("We are also an Authorized Crane Partner of “KITO” Japan for Electric Chain Hoist, Manual Hoist, Rope Hoist. KITO is the Worlds No.1 Chain Hoist manufacturer.", pdfStyles.spacing.padding, y, { maxWidth: pdfWidth - 2 * pdfStyles.spacing.padding });
+        pdf.text("We are also an Authorized Crane Partner of \"KITO\" Japan for Electric Chain Hoist, Manual Hoist, Rope Hoist. KITO is the Worlds No.1 Chain Hoist manufacturer.", pdfStyles.spacing.padding, y, { maxWidth: pdfWidth - 2 * pdfStyles.spacing.padding });
         y += pdfStyles.spacing.lineHeight * 4;
         pdf.setFontSize(pdfStyles.fontSize.sectionTitle);
         pdf.setFont(pdfStyles.font.family, pdfStyles.font.bold);
@@ -272,14 +275,14 @@ export const downloadQuotationPdf = async (record) => {
         pdf.text("Yours Faithfully", pdfStyles.spacing.padding, y);
         y += pdfStyles.spacing.lineHeight;
         pdf.setFont(pdfStyles.font.family, pdfStyles.font.bold);
-        pdf.text("For MEGA CRANES INDIA PVT LTD.,", pdfStyles.spacing.padding, y);
+        pdf.text("For VR INDUSTRIAL SOLUTIONS & MACHINERY", pdfStyles.spacing.padding, y);
         y += pdfStyles.spacing.lineHeight * 3;
-        pdf.text("Sivaraman.P.S", pdfStyles.spacing.padding, y);
+        pdf.text("V. Sivaraman", pdfStyles.spacing.padding, y);
         y += pdfStyles.spacing.lineHeight;
         pdf.setFont(pdfStyles.font.family, pdfStyles.font.normal);
-        pdf.text("Head – Business Development", pdfStyles.spacing.padding, y);
+        pdf.text("Proprietor", pdfStyles.spacing.padding, y);
         y += pdfStyles.spacing.lineHeight;
-        pdf.text("+91 9944039125", pdfStyles.spacing.padding, y);
+        pdf.text("+91 95004 76026", pdfStyles.spacing.padding, y);
         let pageCount = pdf.internal.getNumberOfPages();
         pdf.addPage();
         y = pdfStyles.spacing.padding;
@@ -551,14 +554,14 @@ export const downloadQuotationPdf = async (record) => {
             await addHeader();
             y += pdfStyles.spacing.lineHeight * 2;
         }
-        pdf.text("For MEGA CRANES INDIA PVT LTD.,", pdfStyles.spacing.padding, y);
+        pdf.text("For VR INDUSTRIAL SOLUTIONS & MACHINERY", pdfStyles.spacing.padding, y);
         y += pdfStyles.spacing.lineHeight * 3;
-        pdf.text("Sivaraman.P.S", pdfStyles.spacing.padding, y);
+        pdf.text("V. Sivaraman", pdfStyles.spacing.padding, y);
         y += pdfStyles.spacing.lineHeight;
         pdf.setFont(pdfStyles.font.family, pdfStyles.font.normal);
-        pdf.text("Head – Business Development", pdfStyles.spacing.padding, y);
+        pdf.text("Proprietor", pdfStyles.spacing.padding, y);
         y += pdfStyles.spacing.lineHeight;
-        pdf.text("+91 9944039125", pdfStyles.spacing.padding, y);
+        pdf.text("+91 95004 76026", pdfStyles.spacing.padding, y);
 
         const finalPageCount = pdf.internal.getNumberOfPages();
         for (let i = 1; i <= finalPageCount; i++) {

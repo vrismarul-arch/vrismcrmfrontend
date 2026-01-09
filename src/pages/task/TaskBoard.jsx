@@ -1,4 +1,3 @@
-// src/pages/TaskBoard.jsx
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import {
   Card,
@@ -6,25 +5,21 @@ import {
   Button,
   Empty,
   Spin,
-  Avatar, Badge,
+  Avatar,
+  Badge,
   Typography,
   message,
-  Popconfirm,
   Select,
   Input,
   Row,
-  Col
+  Col,
+  Tooltip,
+  Space
 } from "antd";
-import {
-  PlusOutlined,
-  CalendarOutlined,
-  UserOutlined,
-  DeleteOutlined
-} from "@ant-design/icons";
+import { PlusOutlined, CalendarOutlined } from "@ant-design/icons";
 import axios from "../../api/axios";
 import moment from "moment";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import { useNavigate } from "react-router-dom";
 import "./TaskManagement.css";
 
 import TaskForm from "./TaskForm";
@@ -43,36 +38,39 @@ const STATUS_COLORS = {
 };
 
 const TaskBoard = () => {
-  const navigate = useNavigate();
-  const [tasks, setTasks] = useState([]);
+  /* ================= STATE ================= */
+  const [tasks, setTasks] = useState([]); // ✅ ALWAYS ARRAY
   const [loading, setLoading] = useState(false);
 
-  // FILTERS
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
   const [filterAssignedTo, setFilterAssignedTo] = useState("");
   const [allUsers, setAllUsers] = useState([]);
 
-  // DETAILS & DRAWER
   const [detailsVisible, setDetailsVisible] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
-
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [drawerEditingTask, setDrawerEditingTask] = useState(null);
 
   const currentUser =
-    JSON.parse(localStorage.getItem("user")) || { role: "Employee", _id: "temp", name: "Unknown" };
+    JSON.parse(localStorage.getItem("user")) || {
+      role: "Employee",
+      _id: "temp",
+      name: "Unknown"
+    };
 
   const isPrivileged =
-    ["Admin", "Superadmin", "SuperAdmin", "Team Leader"].includes(currentUser.role);
+    ["Admin", "Superadmin", "SuperAdmin", "Team Leader"].includes(
+      currentUser.role
+    );
 
-  // Load users for Assigned filter
+  /* ================= USERS ================= */
   const fetchUsers = useCallback(async () => {
     try {
       const res = await axios.get("/api/users");
-      setAllUsers(res.data || []);
-    } catch (err) {
-      console.error("User load error", err);
+      setAllUsers(Array.isArray(res.data) ? res.data : []);
+    } catch (e) {
+      console.error(e);
     }
   }, []);
 
@@ -80,7 +78,7 @@ const TaskBoard = () => {
     fetchUsers();
   }, [fetchUsers]);
 
-  // Load tasks from backend
+  /* ================= TASKS (SAFE) ================= */
   const fetchTasks = useCallback(
     async (opts = {}) => {
       setLoading(true);
@@ -93,8 +91,8 @@ const TaskBoard = () => {
 
         if (!isPrivileged && !qAssignedTo) {
           params.append("assignedTo", currentUser._id);
-        } else {
-          if (qAssignedTo) params.append("assignedTo", qAssignedTo);
+        } else if (qAssignedTo) {
+          params.append("assignedTo", qAssignedTo);
         }
 
         if (qStatus) params.append("status", qStatus);
@@ -102,13 +100,18 @@ const TaskBoard = () => {
 
         const res = await axios.get(`/api/tasks?${params.toString()}`);
 
-        if (Array.isArray(res.data)) setTasks(res.data);
-        else if (res.data.tasks) setTasks(res.data.tasks);
-        else setTasks([]);
+        // ✅ ABSOLUTE SAFETY
+        const safeTasks = Array.isArray(res.data)
+          ? res.data
+          : Array.isArray(res.data?.tasks)
+          ? res.data.tasks
+          : [];
 
-      } catch (err) {
-        console.error("Fetch tasks err", err);
-        message.error("Failed to load tasks.");
+        setTasks(safeTasks);
+      } catch (e) {
+        console.error(e);
+        message.error("Failed to load tasks");
+        setTasks([]); // ✅ NEVER BREAK
       } finally {
         setLoading(false);
       }
@@ -120,128 +123,78 @@ const TaskBoard = () => {
     fetchTasks();
   }, [fetchTasks]);
 
-  // Apply filters automatically (with delay)
   useEffect(() => {
     const t = setTimeout(() => {
-      fetchTasks({ search, status: filterStatus, assignedTo: filterAssignedTo });
-    }, 200);
+      fetchTasks({
+        search,
+        status: filterStatus,
+        assignedTo: filterAssignedTo
+      });
+    }, 300);
     return () => clearTimeout(t);
   }, [search, filterStatus, filterAssignedTo, fetchTasks]);
 
-  const handleDeleteTask = async (taskId) => {
-    try {
-      await axios.delete(`/api/tasks/${taskId}`);
-      message.success("Task deleted");
-      fetchTasks();
-    } catch (err) {
-      console.error(err);
-      message.error("Failed to delete task");
-    }
-  };
-
-  const groupTasks = useCallback(() => {
+  /* ================= GROUP TASKS (SAFE) ================= */
+  const grouped = useMemo(() => {
     const grouped = {};
-    (tasks || []).forEach((t) => {
+    STATUS_ORDER.forEach((s) => (grouped[s] = []));
+
+    (Array.isArray(tasks) ? tasks : []).forEach((t) => {
       const overdue =
         t.dueDate &&
         moment(t.dueDate).isBefore(moment(), "day") &&
         t.status !== "Completed";
 
       const key = overdue ? "Overdue" : t.status || "To Do";
-
-      if (!grouped[key]) grouped[key] = [];
       grouped[key].push(t);
-    });
-
-    STATUS_ORDER.forEach((s) => {
-      if (!grouped[s]) grouped[s] = [];
     });
 
     return grouped;
   }, [tasks]);
 
-  const grouped = useMemo(() => groupTasks(), [groupTasks]);
-
-  // DRAG END
-  const onDragEnd = async (result) => {
-    const { source, destination, draggableId } = result;
+  /* ================= DRAG ================= */
+  const onDragEnd = async ({ source, destination, draggableId }) => {
     if (!destination) return;
-    if (source.droppableId === destination.droppableId && source.index === destination.index)
+    if (
+      source.droppableId === destination.droppableId &&
+      source.index === destination.index
+    )
       return;
-
-    const g = groupTasks();
-    const sourceList = Array.from(g[source.droppableId]);
-    const [moved] = sourceList.splice(source.index, 1);
-
-    const destList = Array.from(g[destination.droppableId]);
 
     const newStatus =
       destination.droppableId === "Overdue"
-        ? moved.status
+        ? grouped[source.droppableId][source.index].status
         : destination.droppableId;
-
-    moved.status = newStatus;
-
-    destList.splice(destination.index, 0, moved);
-
-    const newTasks = [].concat(
-      ...STATUS_ORDER.map((s) =>
-        s === source.droppableId
-          ? sourceList
-          : s === destination.droppableId
-            ? destList
-            : g[s]
-      )
-    );
-
-    setTasks(newTasks);
 
     try {
       await axios.put(`/api/tasks/${draggableId}`, { status: newStatus });
       fetchTasks();
-    } catch (err) {
-      console.error(err);
-      message.error("Failed to update task.");
+    } catch {
+      message.error("Failed to update task");
       fetchTasks();
     }
   };
 
-  const openDetails = (task) => {
-    setSelectedTask(task);
-    setDetailsVisible(true);
-  };
-
-  const openDrawerForEdit = (task) => {
-    setDrawerEditingTask(task || null);
-    setDrawerVisible(true);
-  };
-
-  const resetFilters = () => {
-    setSearch("");
-    setFilterStatus("");
-    setFilterAssignedTo("");
-    fetchTasks({ search: "", status: "", assignedTo: "" });
-  };
-
+  /* ================= UI ================= */
   return (
     <Card
       title={<Title level={4}>Task Board</Title>}
       extra={
-        <div style={{ display: "flex", gap: 8 }}>
-          {/* SHOW BUTTON ONLY FOR PRIVILEGED ROLES */}
-          {isPrivileged && (
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={() => openDrawerForEdit(null)}
-            >
-              New Task
-            </Button>
-          )}
-        </div>
+        isPrivileged && (
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => {
+              setDrawerEditingTask(null);
+              setDrawerVisible(true);
+            }}
+          >
+            New Task
+          </Button>
+        )
       }
     >
-      {/* FILTER BAR */}
+      {/* FILTERS */}
       <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
         <Col xs={24} sm={10} md={8} lg={6}>
           <Input.Search
@@ -257,7 +210,7 @@ const TaskBoard = () => {
             placeholder="Status"
             allowClear
             value={filterStatus}
-            onChange={(v) => setFilterStatus(v)}
+            onChange={setFilterStatus}
             style={{ width: "100%" }}
           >
             <Option value="">All</Option>
@@ -273,9 +226,9 @@ const TaskBoard = () => {
           <Select
             placeholder="Assigned To"
             allowClear
-            value={filterAssignedTo}
-            onChange={(v) => setFilterAssignedTo(v)}
             showSearch
+            value={filterAssignedTo}
+            onChange={setFilterAssignedTo}
             optionFilterProp="children"
             style={{ width: "100%" }}
           >
@@ -287,140 +240,74 @@ const TaskBoard = () => {
             ))}
           </Select>
         </Col>
-
-        <Col>
-          <Button onClick={resetFilters}>Reset</Button>
-        </Col>
       </Row>
 
-      {/* BOARD */}
       {loading ? (
-        <div style={{ textAlign: "center", padding: 40 }}>
-          <Spin size="large" />
-        </div>
+        <Spin style={{ display: "block", margin: "40px auto" }} />
       ) : (
         <DragDropContext onDragEnd={onDragEnd}>
           <div className="kanban-board-row">
-            {STATUS_ORDER.filter((st) => {
-              if (filterStatus) return st === filterStatus;
-              return true;
-            }).map((status) => (
+            {STATUS_ORDER.map((status) => (
               <div key={status} className="kanban-column">
                 <Card
-                  className="kanban-column-card"
+                  size="small"
                   title={
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <Title level={5} style={{ margin: 0, color: STATUS_COLORS[status] }}>
+                    <Space>
+                      <Title
+                        level={5}
+                        style={{ margin: 0, color: STATUS_COLORS[status] }}
+                      >
                         {status}
                       </Title>
-                      <Tag>{grouped[status]?.length}</Tag>
-                    </div>
+                      <Tag>{grouped[status].length}</Tag>
+                    </Space>
                   }
-                  size="small"
                 >
                   <Droppable droppableId={status}>
-                    {(provided) => (
-                      <div ref={provided.innerRef} {...provided.droppableProps} className="task-list">
-                        {grouped[status].map((task, index) => {
-                          const overdue =
-                            task.dueDate &&
-                            moment(task.dueDate).isBefore(moment(), "day") &&
-                            task.status !== "Completed";
-
-                          const statusClass = overdue
-                            ? "overdue"
-                            : task.status.replace(/\s/g, "").toLowerCase();
-
-                          return (
-                         <Draggable draggableId={task._id} index={index} key={task._id}>
-  {(prov) => {
-    const cardInner = (
-      <div
-        ref={prov.innerRef}
-        {...prov.draggableProps}
-        {...prov.dragHandleProps}
-        className={`task-card-item ${statusClass}`}
-        onClick={(e) => {
-          if (e.target.closest(".delete-btn")) return;
-          openDetails(task);
-        }}
-        style={{ position: "relative" }}
-      >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <Title level={5} style={{ margin: 0 }}>
-            {task.title}
-          </Title>
-
-          <Popconfirm
-            title="Delete this task?"
-            onConfirm={() => handleDeleteTask(task._id)}
-            okText="Yes"
-            cancelText="No"
-          >
-            <DeleteOutlined
-              className="delete-btn"
-              style={{
-                color: isPrivileged ? "red" : "#999",
-                fontSize: 16,
-                cursor: isPrivileged ? "pointer" : "not-allowed"
-              }}
-              onClick={(e) => {
-                e.stopPropagation();
-                if (!isPrivileged) message.error("You do not have permission");
-              }}
-            />
-          </Popconfirm>
-        </div>
-
-        {task.description && (
-          <Text type="secondary" style={{ fontSize: 12 }}>
-            {task.description.length > 80
-              ? task.description.substring(0, 80) + "..."
-              : task.description}
-          </Text>
-        )}
-
-        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 10 }}>
-          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-            <Avatar size="small" icon={<UserOutlined />} />
-            <Text style={{ fontSize: 12 }}>
-              {task.assignedTo?.name || "Unassigned"}
-            </Text>
-          </div>
-
-          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-            <CalendarOutlined />
-            <Text style={{ fontSize: 12, color: overdue ? "red" : "" }}>
-              {task.dueDate ? moment(task.dueDate).format("MMM Do") : "No Due"}
-            </Text>
-          </div>
-        </div>
-      </div>
-    );
-
-    return task.isImportant ? (
-      <Badge.Ribbon
-        text="Important"
-        color="red"
-        placement="start"
-        key={task._id}
-        style={{ zIndex: 20 }}
-      >
-        {cardInner}
-      </Badge.Ribbon>
-    ) : (
-      cardInner
-    );
-  }}
-</Draggable>
-
-                          );
-                        })}
-
-                        {provided.placeholder}
-
-                        {grouped[status].length === 0 && (
-                          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No tasks" />
+                    {(p) => (
+                      <div
+                        ref={p.innerRef}
+                        {...p.droppableProps}
+                        className="task-list"
+                      >
+                        {grouped[status].map((task, index) => (
+                          <Draggable
+                            key={task._id}
+                            draggableId={task._id}
+                            index={index}
+                          >
+                            {(prov) => (
+                              <div
+                                ref={prov.innerRef}
+                                {...prov.draggableProps}
+                                {...prov.dragHandleProps}
+                              >
+                                {task.isImportant ? (
+                                  <Badge.Ribbon text="IMPORTANT">
+                                    <TaskCard
+                                      task={task}
+                                      onClick={() => {
+                                        setSelectedTask(task);
+                                        setDetailsVisible(true);
+                                      }}
+                                    />
+                                  </Badge.Ribbon>
+                                ) : (
+                                  <TaskCard
+                                    task={task}
+                                    onClick={() => {
+                                      setSelectedTask(task);
+                                      setDetailsVisible(true);
+                                    }}
+                                  />
+                                )}
+                              </div>
+                            )}
+                          </Draggable>
+                        ))}
+                        {p.placeholder}
+                        {!grouped[status].length && (
+                          <Empty description="No tasks" />
                         )}
                       </div>
                     )}
@@ -432,29 +319,22 @@ const TaskBoard = () => {
         </DragDropContext>
       )}
 
-      {/* Details Drawer */}
       <TaskDetailsDrawer
         visible={detailsVisible}
         task={selectedTask}
         onClose={() => setDetailsVisible(false)}
-        onEdit={(task) => {
+        onEdit={(t) => {
+          setDrawerEditingTask(t);
+          setDrawerVisible(true);
           setDetailsVisible(false);
-          setTimeout(() => openDrawerForEdit(task), 200);
         }}
-        onDeleted={() => {
-          setDetailsVisible(false);
-          fetchTasks();
-        }}
+        onDeleted={fetchTasks}
       />
 
-      {/* New/Edit Task Drawer */}
       <TaskForm
         visible={drawerVisible}
         editing={drawerEditingTask}
-        onClose={() => {
-          setDrawerVisible(false);
-          setDrawerEditingTask(null);
-        }}
+        onClose={() => setDrawerVisible(false)}
         onSaved={() => {
           setDrawerVisible(false);
           fetchTasks();
@@ -464,4 +344,50 @@ const TaskBoard = () => {
   );
 };
 
+/* ================= TASK CARD ================= */
+const TaskCard = ({ task, onClick }) => (
+  <div className="task-card-item" onClick={onClick}>
+    <Title level={5} style={{ marginBottom: 6 }}>
+      {task.title}
+    </Title>
+
+    {task.description && (
+      <Text type="secondary" style={{ fontSize: 12 }}>
+        {task.description.length > 80
+          ? task.description.slice(0, 80) + "..."
+          : task.description}
+      </Text>
+    )}
+
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginTop: 10
+      }}
+    >
+      <Avatar.Group maxCount={4} size="small">
+        {task.assignedTo?.map((u) => (
+          <Tooltip title={u.name} key={u._id}>
+            <Avatar src={u.profileImage || undefined}>
+              {u.name?.charAt(0)?.toUpperCase()}
+            </Avatar>
+          </Tooltip>
+        ))}
+      </Avatar.Group>
+
+      <Space>
+        <CalendarOutlined />
+        <Text style={{ fontSize: 12 }}>
+          {task.dueDate
+            ? moment(task.dueDate).format("MMM Do")
+            : "No Due"}
+        </Text>
+      </Space>
+    </div>
+  </div>
+);
+
 export default TaskBoard;
+                                  

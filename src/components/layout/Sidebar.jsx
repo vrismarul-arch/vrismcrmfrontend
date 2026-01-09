@@ -20,7 +20,9 @@ import {
   CalendarOutlined, // Imported for Daily Planner/Attendance
   IdcardOutlined, // Imported for Profile
   FolderOpenOutlined,
-  NodeIndexOutlined, // Imported for Leads/Clients/Quotations
+  NodeIndexOutlined,
+  StepForwardFilled,
+  ProjectFilled, // Imported for Leads/Clients/Quotations
 } from "@ant-design/icons";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./sidebar.css";
@@ -58,17 +60,28 @@ const Sidebar = ({ collapsed }) => {
           icon: <BarChartOutlined />, // Added Icon
         },
         {
+          key: "/taskmanage",
+          label: "Task Dashboard",
+          roles: ["Admin", "Superadmin", "Team Leader", "Employee"],
+          icon: <ScheduleOutlined />, // Added Icon
+        }
+        
+      ],
+    },
+    {
+      key: "/Report",
+      icon: <FolderOpenOutlined />,
+      label: "Mange Reports",
+      roles: ["Admin", "Superadmin", "Employee", "Team Leader"],
+      children: [
+        
+        {
           key: "/manage-leaves",
           label: "ManageLeaves",
           roles: ["Admin", "Superadmin", "Team Leader"],
           icon: <UserSwitchOutlined />, // Added Icon
         },
-        {
-          key: "/taskmanage",
-          label: "Task Dashboard",
-          roles: ["Admin", "Superadmin", "Team Leader", "Employee"],
-          icon: <ScheduleOutlined />, // Added Icon
-        },
+        
         {
           key: "/dailyplan",
           label: "Daily Planner",
@@ -87,7 +100,22 @@ const Sidebar = ({ collapsed }) => {
           roles: ["Admin", "Superadmin", "Team Leader"],
           icon: <SecurityScanOutlined />, // Added Icon
         },
-        {
+        
+      ],
+    },
+    {
+      key: "/project-management",
+      icon: <ProjectFilled />,
+      label: "Project Management",
+      roles: ["Admin", "Superadmin", "Team Leader", "Employee"],
+      children: [
+         {
+          key: "/process-step",
+          icon: <StepForwardFilled />,
+          label: "Process Step",
+          roles: ["Admin", "Superadmin", "Team Leader"],
+        },
+       {
           key: "/projects",
           label: "Projects",
           roles: ["Admin", "Superadmin", "Team Leader", "Employee"],
@@ -98,7 +126,7 @@ const Sidebar = ({ collapsed }) => {
           label: "Tracking",
           roles: ["Admin", "Superadmin", "Team Leader"],
           icon: <AppstoreOutlined />, // Added Icon
-        },
+        }
       ],
     },
     {
@@ -117,6 +145,12 @@ const Sidebar = ({ collapsed }) => {
           key: "/clients",
           icon: <UserOutlined />,
           label: "Clients",
+          roles: ["Admin", "Superadmin", "Team Leader"],
+        },
+        {
+          key: "/process-step",
+          icon: <StepForwardFilled />,
+          label: "Process Step",
           roles: ["Admin", "Superadmin", "Team Leader"],
         },
         {
@@ -187,7 +221,7 @@ const Sidebar = ({ collapsed }) => {
     },
     {
       key: "/clinet",
-      icon: <NodeIndexOutlined/>,
+      icon: <NodeIndexOutlined />,
       label: "Client",
       roles: ["Superadmin", "Client"],
       children: [
@@ -203,7 +237,7 @@ const Sidebar = ({ collapsed }) => {
           label: "Subscriptions",
           roles: ["Client"],
         },
-        
+
         {
           key: "/createsubscriptions",
           icon: <IdcardOutlined />,
@@ -299,7 +333,7 @@ const Sidebar = ({ collapsed }) => {
         theme="light"
         items={menuItems}
         // selectedKeys needs to check the full path to select the correct leaf item
-        selectedKeys={[location.pathname]} 
+        selectedKeys={[location.pathname]}
         openKeys={openKeys}
         onOpenChange={onOpenChange}
         onClick={handleMenuClick}

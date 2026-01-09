@@ -1,7 +1,7 @@
 // FooterComponent.jsx
 import React from 'react';
 import { Layout } from 'antd';
-
+import './Footer.css';
 const { Footer } = Layout;
 
 const FooterComponent = () => {
@@ -19,7 +19,7 @@ const FooterComponent = () => {
         color: '#ffffffff',
       }}
     >
-      © {new Date().getFullYear()} All rights are reserved by <strong> <a href="https://megacranesindia.com/" target="_blank" rel="noopener noreferrer"><span className='company'>Vrism</span></a></strong> 
+      © {new Date().getFullYear()} All rights are reserved by <strong> <a href="https://vrism.in/" target="_blank" rel="noopener noreferrer"><span className='company-name'>Vrism</span></a></strong> 
 
 
     </Footer>

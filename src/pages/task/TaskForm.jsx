@@ -1,4 +1,3 @@
-// src/components/TaskForm.jsx
 import React, { useEffect, useState } from "react";
 import {
   Drawer,
@@ -12,22 +11,38 @@ import {
   Card,
   Typography,
   Switch,
-  TimePicker
+  TimePicker,
+  Upload
 } from "antd";
+import { InboxOutlined } from "@ant-design/icons";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import moment from "moment";
 import axios from "../../api/axios";
+import { uploadFile } from "../../utils/fileStorage";
 import "./TaskForm.css";
 
 const { TextArea } = Input;
 const { Option } = Select;
 const { Title, Text } = Typography;
+const { Dragger } = Upload;
+
+/* ---------- FILE TYPES ---------- */
+const ALLOWED_TYPES = [
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "image/jpeg",
+  "image/png",
+  "image/jpg",
+  "image/webp"
+];
 
 const TaskForm = ({ visible, onClose, editing, onSaved }) => {
   const [form] = Form.useForm();
 
+  /* ---------- CURRENT USER ---------- */
   const currentUser =
     JSON.parse(localStorage.getItem("user")) || {
       _id: "temp",
@@ -39,38 +54,37 @@ const TaskForm = ({ visible, onClose, editing, onSaved }) => {
     currentUser.role
   );
 
-  // Dropdowns
+  /* ---------- STATE ---------- */
   const [allUsers, setAllUsers] = useState([]);
   const [accounts, setAccounts] = useState([]);
   const [services, setServices] = useState([]);
 
-  // Time & Date
   const [assignedDate, setAssignedDate] = useState(new Date());
   const [dueDate, setDueDate] = useState(moment().add(1, "days").toDate());
-const [startTime, setStartTime] = useState(moment("09:00 AM", "hh:mm A"));
-  const [saving, setSaving] = useState(false);
+  const [startTime, setStartTime] = useState(moment("09:00", "HH:mm"));
 
-  // Load users, accounts, services
+  const [saving, setSaving] = useState(false);
+  const [fileList, setFileList] = useState([]);
+
+  /* ---------- NOTES (NEW – ONLY ADDITION) ---------- */
+  const [noteText, setNoteText] = useState("");
+  const [addingNote, setAddingNote] = useState(false);
+
+  /* ---------- LOAD MASTER DATA ---------- */
   useEffect(() => {
     const loadAll = async () => {
-      try {
-        const u = await axios.get("/api/users");
-        setAllUsers(u.data || []);
+      const u = await axios.get("/api/users");
+      const a = await axios.get("/api/accounts");
+      const s = await axios.get("/api/service");
 
-        const a = await axios.get("/api/accounts");   // ✔ Correct API
-        setAccounts(a.data || []);
-
-        const s = await axios.get("/api/service");    // ✔ Correct API
-        setServices(s.data || []);
-
-      } catch (err) {
-        console.error("Dropdown Load Error:", err);
-      }
+      setAllUsers(u.data || []);
+      setAccounts(a.data || []);
+      setServices(s.data || []);
     };
     loadAll();
   }, []);
 
-  // Load existing data for editing
+  /* ---------- LOAD FORM ---------- */
   useEffect(() => {
     form.resetFields();
 
@@ -78,91 +92,99 @@ const [startTime, setStartTime] = useState(moment("09:00 AM", "hh:mm A"));
       form.setFieldsValue({
         title: editing.title,
         description: editing.description,
-        assignedTo: editing.assignedTo?._id,
-        status: editing.status,
-
-        // new fields
         reason: editing.reason,
-        timeRequired: editing.timeRequired,
-        extraAttachment: editing.extraAttachment?.[0] || "",
+        assignedTo: editing.assignedTo?.map(u => u._id) || [],
+        status: editing.status,
         isImportant: editing.isImportant || false,
-
-        accountId: editing.accountId?._id,
-        serviceId: editing.serviceId?._id
+        extraAttachment: editing.extraAttachment?.[0] || "",
+        accountId: editing.accountId || undefined,
+        serviceId: editing.serviceId || undefined
       });
 
+      setAssignedDate(new Date(editing.assignedDate));
+      setDueDate(new Date(editing.dueDate));
       setStartTime(
-        editing.startTime ? moment(editing.startTime, "HH:mm") : moment("09:00", "HH:mm")
+        editing.startTime
+          ? moment(editing.startTime, "HH:mm")
+          : moment("09:00", "HH:mm")
       );
-
-      setAssignedDate(editing.assignedDate ? new Date(editing.assignedDate) : new Date());
-      setDueDate(
-        editing.dueDate ? new Date(editing.dueDate) : moment().add(1, "days").toDate()
-      );
-
     } else {
       form.setFieldsValue({
-        assignedTo: currentUser._id,
+        assignedTo: [currentUser._id],
         status: "To Do",
         isImportant: false
       });
 
       setAssignedDate(new Date());
-      setStartTime(moment("09:00", "HH:mm"));
       setDueDate(moment().add(1, "days").toDate());
+      setStartTime(moment("09:00", "HH:mm"));
     }
   }, [editing, visible]);
 
-  // Save task
+  /* ---------- FILE VALIDATION ---------- */
+  const beforeUpload = (file) => {
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      message.error("Only PDF, DOC, DOCX or image files allowed");
+      return Upload.LIST_IGNORE;
+    }
+    return false;
+  };
+
+  /* ---------- SAVE TASK ---------- */
   const handleSave = async () => {
     try {
       const values = await form.validateFields();
+      setSaving(true);
+
+      const uploadedFiles = [];
+      for (const file of fileList) {
+        const res = await uploadFile(file.originFileObj);
+        if (res?.url) uploadedFiles.push(res.url);
+      }
 
       const payload = {
         ...values,
-
+        assignedBy: editing ? editing.assignedBy?._id : currentUser._id,
         assignedDate: moment.utc(assignedDate).startOf("day").toISOString(),
         dueDate: moment.utc(dueDate).startOf("day").toISOString(),
-
         startTime: startTime.format("HH:mm"),
-
-        extraAttachment: values.extraAttachment ? [values.extraAttachment] : []
+        extraAttachment: values.extraAttachment
+          ? [values.extraAttachment]
+          : [],
+        attachments: uploadedFiles
       };
 
-      setSaving(true);
-
       if (editing) {
-        payload.assignedBy = editing.assignedBy?._id;
         await axios.put(`/api/tasks/${editing._id}`, payload);
         message.success("Task updated");
       } else {
-        payload.assignedBy = currentUser._id;
         await axios.post("/api/tasks", payload);
         message.success("Task created");
       }
 
-      onSaved?.();
+      setFileList([]);
+      onSaved();
       onClose();
-
-    } catch (err) {
-      console.error(err);
-      message.error("Save failed: " + (err.response?.data?.message || err.message));
+    } catch {
+      message.error("Save failed");
     } finally {
       setSaving(false);
     }
   };
 
+  /* ================= RENDER ================= */
   return (
     <Drawer
       title={editing ? "Edit Task" : "Create Task"}
-      width={700}
+      width={720}
       open={visible}
       onClose={onClose}
       destroyOnClose
-      forceRender   // ✔ FIX WARNING
       footer={
         <div style={{ textAlign: "right" }}>
-          <Button onClick={onClose}>Cancel</Button>
+          <Button onClick={onClose} style={{ marginRight: 8 }}>
+            Cancel
+          </Button>
           <Button type="primary" loading={saving} onClick={handleSave}>
             {editing ? "Update Task" : "Create Task"}
           </Button>
@@ -171,20 +193,20 @@ const [startTime, setStartTime] = useState(moment("09:00 AM", "hh:mm A"));
     >
       <Form form={form} layout="vertical">
 
-        {/* BASIC */}
+        {/* ================= BASIC ================= */}
         <Card className="zoho-section-card">
           <Title level={5}>Basic Information</Title>
 
           <Form.Item
             name="title"
-            label="Task Title *"
-            rules={[{ required: true }]}
+            label="Task Title"
+            rules={[{ required: true, message: "Task title required" }]}
           >
-            <Input placeholder="Enter task title" />
+            <Input />
           </Form.Item>
 
           <Form.Item name="description" label="Description">
-            <TextArea rows={3} placeholder="Task details" />
+            <TextArea rows={4} />
           </Form.Item>
 
           <Form.Item name="isImportant" label="Mark Important">
@@ -192,34 +214,48 @@ const [startTime, setStartTime] = useState(moment("09:00 AM", "hh:mm A"));
           </Form.Item>
         </Card>
 
-        {/* ADDITIONAL */}
+        {/* ================= ADDITIONAL ================= */}
         <Card className="zoho-section-card">
-          <Title level={5}>Additional Fields</Title>
+          <Title level={5}>Additional Details</Title>
 
           <Form.Item name="reason" label="Reason">
-            <TextArea rows={2} placeholder="Why this task?" />
+            <TextArea rows={2} />
           </Form.Item>
-     <Form.Item name="startTime" label="Start Time">
-  <TimePicker
-    value={startTime}
-    format="hh:mm A"
-    use12Hours
-    minuteStep={5}
-    inputReadOnly     // 🔥 enables mobile wheel/spinner UI
-    style={{ width: "100%" }}
-    onChange={(v) => setStartTime(v)}
-  />
-</Form.Item>
+
+          <Form.Item label="Start Time">
+            <TimePicker
+              value={startTime}
+              use12Hours
+              format="hh:mm A"
+              style={{ width: "100%" }}
+              onChange={setStartTime}
+            />
+          </Form.Item>
 
           <Form.Item name="extraAttachment" label="Attachment URL">
-            <Input placeholder="Paste URL here" />
+            <Input />
           </Form.Item>
 
-           <Title level={5}>Account & Service</Title>
+          <Form.Item label="Upload Files">
+            <Dragger
+              multiple
+              beforeUpload={beforeUpload}
+              fileList={fileList}
+              onChange={({ fileList }) => setFileList(fileList)}
+            >
+              <InboxOutlined />
+              <p>Drag & drop files here</p>
+            </Dragger>
+          </Form.Item>
+        </Card>
+
+        {/* ================= ACCOUNT ================= */}
+        <Card className="zoho-section-card">
+          <Title level={5}>Account & Service</Title>
 
           <Form.Item name="accountId" label="Account">
-            <Select placeholder="Select account">
-              {accounts.map((a) => (
+            <Select allowClear>
+              {accounts.map(a => (
                 <Option key={a._id} value={a._id}>
                   {a.businessName}
                 </Option>
@@ -228,8 +264,8 @@ const [startTime, setStartTime] = useState(moment("09:00 AM", "hh:mm A"));
           </Form.Item>
 
           <Form.Item name="serviceId" label="Service">
-            <Select placeholder="Select service">
-              {services.map((s) => (
+            <Select allowClear>
+              {services.map(s => (
                 <Option key={s._id} value={s._id}>
                   {s.serviceName}
                 </Option>
@@ -238,8 +274,7 @@ const [startTime, setStartTime] = useState(moment("09:00 AM", "hh:mm A"));
           </Form.Item>
         </Card>
 
-      
-        {/* ASSIGN */}
+        {/* ================= ASSIGN ================= */}
         <Card className="zoho-section-card">
           <Title level={5}>Assignment</Title>
 
@@ -250,8 +285,8 @@ const [startTime, setStartTime] = useState(moment("09:00 AM", "hh:mm A"));
                 label="Assign To"
                 rules={[{ required: true }]}
               >
-                <Select disabled={!canAssign}>
-                  {allUsers.map((u) => (
+                <Select mode="multiple" disabled={!canAssign}>
+                  {allUsers.map(u => (
                     <Option key={u._id} value={u._id}>
                       {u.name}
                     </Option>
@@ -273,28 +308,16 @@ const [startTime, setStartTime] = useState(moment("09:00 AM", "hh:mm A"));
           </Row>
         </Card>
 
-        {/* DATES */}
+        {/* ================= DATES ================= */}
         <Card className="zoho-section-card">
           <Title level={5}>Dates</Title>
 
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item label="Assigned Date">
-                <DatePicker
-                  selected={assignedDate}
-                  onChange={setAssignedDate}
-                  dateFormat="yyyy/MM/dd"
-                />
-              </Form.Item>
+              <DatePicker selected={assignedDate} onChange={setAssignedDate} />
             </Col>
             <Col span={12}>
-              <Form.Item label="Due Date">
-                <DatePicker
-                  selected={dueDate}
-                  onChange={setDueDate}
-                  dateFormat="yyyy/MM/dd"
-                />
-              </Form.Item>
+              <DatePicker selected={dueDate} onChange={setDueDate} />
             </Col>
           </Row>
 
@@ -303,6 +326,62 @@ const [startTime, setStartTime] = useState(moment("09:00 AM", "hh:mm A"));
             <b>{editing ? editing.assignedBy?.name : currentUser.name}</b>
           </Text>
         </Card>
+
+        {/* ================= NOTES HISTORY (NEW) ================= */}
+        {editing && (
+          <Card className="zoho-section-card">
+            <Title level={5}>Reason / Notes History</Title>
+
+            <TextArea
+              rows={3}
+              value={noteText}
+              onChange={e => setNoteText(e.target.value)}
+              placeholder="Add note"
+            />
+
+            <Button
+              type="primary"
+              disabled={!noteText.trim()}
+              loading={addingNote}
+              style={{ marginTop: 8 }}
+              onClick={async () => {
+                try {
+                  setAddingNote(true);
+                  await axios.put(
+                    `/api/tasks/${editing._id}/add-note`,
+                    { text: noteText }
+                  );
+                  setNoteText("");
+                  onSaved();
+                } finally {
+                  setAddingNote(false);
+                }
+              }}
+            >
+              Add Note
+            </Button>
+
+            <div style={{ marginTop: 16 }}>
+              {editing.reasonHistory?.length ? (
+                editing.reasonHistory
+                  .slice()
+                  .reverse()
+                  .map((n, i) => (
+                    <Card key={i} size="small">
+                      <Text strong>{n.addedBy?.name}</Text>
+                      <br />
+                      <Text type="secondary">
+                        {moment(n.createdAt).format("DD MMM YYYY hh:mm A")}
+                      </Text>
+                      <p>{n.text}</p>
+                    </Card>
+                  ))
+              ) : (
+                <Text type="secondary">No notes yet</Text>
+              )}
+            </div>
+          </Card>
+        )}
 
       </Form>
     </Drawer>

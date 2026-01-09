@@ -2,6 +2,17 @@
   background: #f7f8fa;
   padding: 20px;
 }
+.preserve-format-textarea textarea {
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.6;
+  font-family: inherit;
+}
+.task-description {
+  white-space: pre-wrap;   /* ⭐ THIS IS THE KEY */
+  line-height: 1.6;
+  word-break: break-word;
+}
 
 .drawer-header-section {
   margin-bottom: 10px;

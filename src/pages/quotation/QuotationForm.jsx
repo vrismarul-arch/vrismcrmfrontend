@@ -78,7 +78,7 @@ ${business.email || ""}
 
     const toastId = toast.loading("Loading business options...");
     try {
-      const res = await axios.get("/api/quotations/leads/active");
+      const res = await axios.get("/api/quotations/leads/customer");
       setBusinessOptions(res.data);
       toast.success("Business options loaded", { id: toastId });
     } catch (error) {
@@ -94,7 +94,7 @@ ${business.email || ""}
 
     const toastId = toast.loading("Loading product options...");
     try {
-      const res = await axios.get("/api/product");
+      const res = await axios.get("/api/service");
       setProductOptions(
         res.data.map((p) => ({
           ...p,
@@ -162,9 +162,7 @@ ${business.email || ""}
       return;
     }
 
-    // setLoading(true); // Removed, parent's isSaving handles this
-    // The loading toast is now managed by the parent's handleSave
-    // const toastId = toast.loading("Saving quotation...");
+
 
     const timestamp = new Date().toLocaleString();
     const newNote = values.noteText

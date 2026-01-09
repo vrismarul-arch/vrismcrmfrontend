@@ -1,119 +1,168 @@
-/* ---------------------------- KANBAN BOARD FIX (FINAL) ---------------------------- */
+/* =====================================================
+   🍎 iOS LIGHT THEME VARIABLES
+===================================================== */
 
-/* Parent row → horizontal layout + no wrap */
+:root {
+  --bg-main: #ffffff;
+  --card-bg: #ffffff;
+  --border-light: rgba(0, 0, 0, 0.08);
+
+  --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-hover: 0 10px 28px rgba(0, 0, 0, 0.14);
+
+  --radius-lg: 16px;
+  --radius-md: 12px;
+
+  --red: #ff3b30;
+  --orange: #ff9500;
+  --blue: #007aff;
+  --green: #34c759;
+  --purple: #af52de;
+
+  --text-main: #111;
+  --text-muted: #6b7280;
+}
+
+/* =====================================================
+   BOARD
+===================================================== */
+
 .kanban-board-row {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap !important;
-    gap: 20px;
-    overflow-x: auto;
-    padding-bottom: 10px;
+  display: flex;
+  gap: 20px;
+  padding: 14px 10px 18px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  background: var(--bg-main);
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
 
-/* Each column */
+/* =====================================================
+   COLUMN
+===================================================== */
+
 .kanban-column {
-    width: 340px;
-    min-width: 340px;
-    flex-shrink: 0;
-    background: white;
-    overflow: visible !important; /* remove scroll parent */
+  width: 340px;
+  min-width: 340px;
+  flex-shrink: 0;
 }
 
-/* Card containing column title + content */
-.kanban-column-card {
-    height: calc(100vh - 180px); /* full usable height */
-    display: flex;
-    flex-direction: column;
-    border-radius: 10px;
-    overflow: visible !important; /* remove scroll parent */
-}
+/* =====================================================
+   TASK LIST
+===================================================== */
 
-/* REMOVE scroll here ❌ */
-.kanban-column-card .ant-card-body {
-    flex: 1;
-    overflow: visible !important;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-/* ONLY scroll inside Droppable (Droppable container) */
 .task-list {
-    max-height: calc(100vh - 250px);
-    overflow-y: auto !important;
-    overflow-x: hidden;
-    padding-right: 6px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
-/* Smooth Scrollbar */
-.task-list::-webkit-scrollbar {
-    width: 6px;
-}
-.task-list::-webkit-scrollbar-thumb {
-    background: rgba(0,0,0,0.3);
-    border-radius: 5px;
-}
+/* =====================================================
+   TASK CARD
+===================================================== */
 
-/* Task card styles */
 .task-card-item {
-    overflow: visible !important;
-    border-radius: 10px;
-    background: #fff;
-    border-left: 5px solid transparent;
-    padding: 10px;
-    transition: 0.2s ease;
-    position: relative;
+  background: var(--card-bg);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
 }
 
-/* Hover effect */
 .task-card-item:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
 }
 
-/* Status color lines */
-.task-card-item.todo {
-    border-left-color: #ff4d4f;
-}
-.task-card-item.inprogress {
-    border-left-color: #fa8c16;
-}
-.task-card-item.review {
-    border-left-color: #1890ff;
-}
-.task-card-item.completed {
-    border-left-color: #52c41a;
+.task-card-item:active {
+  transform: scale(0.97);
 }
 
-/* Overdue highlight */
-.task-card-item.overdue {
-    border-left-color: #ff0043 !important;
-    background: #fff7f9;
-}
+/* =====================================================
+   🍎 SMOOTH iOS-STYLE IMPORTANT RIBBON
+===================================================== */
 
-/* Ribbon fixes */
 .ant-ribbon {
-    z-index: 2000 !important;
-    left: -6px !important;
-    top: -6px !important;
+  top: 8px !important;
+  right: 8px !important;
+  padding: 0 !important;
+  border-radius: 999px !important;
+  overflow: hidden;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.14);
 }
+
 .ant-ribbon-text {
-    font-weight: 600;
-    font-size: 12px;
+  background: linear-gradient(135deg, #ff3b30, #ff6a5c);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  line-height: 1;
+  letter-spacing: 0.3px;
 }
 
-/* -------------------------- MOBILE -------------------------- */
-@media (max-width: 768px) {
-    .kanban-column {
-        width: 260px;
-        min-width: 260px;
-    }
+.ant-ribbon-corner {
+  display: none !important;
+}
 
-    .kanban-column-card {
-        height: calc(100vh - 220px);
-    }
+/* =====================================================
+   FOOTER
+===================================================== */
+
+.task-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* =====================================================
+   TYPOGRAPHY
+===================================================== */
+
+.task-card-item h5 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-main);
+}
+
+/* =====================================================
+   EMPTY STATE
+===================================================== */
+
+.ant-empty {
+  margin-top: 40px;
+  opacity: 0.6;
+}
+
+/* =====================================================
+   MOBILE OPTIMIZATION
+===================================================== */
+
+@media (max-width: 768px) {
+  .kanban-column {
+    width: 270px;
+    min-width: 270px;
+  }
+
+  .task-card-item {
+    padding: 10px;
+  }
+
+  .ant-ribbon-text {
+    font-size: 10px;
+    padding: 3px 8px;
+  }
 }

@@ -12,7 +12,7 @@ import {
   message,
   Select,
 } from "antd";
-import { PlusOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import { PlusOutlined, DeleteOutlined, EditOutlined, ProductFilled } from "@ant-design/icons";
 import axios from "../../api/axios"; // Assuming axios instance is configured
 
 const { Option } = Select;
@@ -162,7 +162,7 @@ export default function ProcessStepPage() {
 
   return (
     <>
-      <h2>⚙️ Process Step Templates</h2>
+      <h2> <ProductFilled/> Process Step Templates</h2>
       <Divider />
 
       <Space style={{ marginBottom: 15 }}>

@@ -269,14 +269,14 @@ const QuotationList = ({
               >
                 View Details
               </Menu.Item>
-              <Menu.Item
+              {/* <Menu.Item
                 key="download"
                 icon={<PrinterOutlined />}
                 // Directly call the named export function
                 onClick={() => downloadQuotationPdf(record)}
               >
                 Download PDF
-              </Menu.Item>
+              </Menu.Item> */}
               <Menu.Item
                 key="notes"
                 icon={<MessageOutlined />}
