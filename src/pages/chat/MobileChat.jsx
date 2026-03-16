@@ -14,7 +14,7 @@ import chat from "./chat.png";
 
 dayjs.extend(relativeTime);
 
-const SOCKET_URL = import.meta.env.VITE_API_URL || "http://localhost:5001";
+const SOCKET_URL = import.meta.env.VITE_API_URL || "http://localhost:1001";
 const socket = io(SOCKET_URL, { transports: ["websocket"], reconnection: true });
 
 export default function MobileChat() {

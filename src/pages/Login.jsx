@@ -49,7 +49,7 @@ const Login = () => {
       } else if (user.role === "Team Leader" || user.role === "Employee") {
         navigate("/attendance");
       } else if (user.role === "Client") {
-        navigate("/subscriptions");
+        navigate("/client-dashboard");
       } else {
         navigate("/eodreport");
       }

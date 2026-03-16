@@ -346,7 +346,7 @@ const Profile = () => {
                 >
                   Edit Profile
                 </Button>
-                <Button
+                {/* <Button
                   type="primary"
                   danger
                   icon={<LogoutOutlined />}
@@ -355,7 +355,7 @@ const Profile = () => {
                   style={{ borderRadius: "8px" }}
                 >
                   Logout
-                </Button>
+                </Button> */}
               </Space>
             </Col>
           </Row>

@@ -1,3 +1,4 @@
+// src/pages/TaskBoard.jsx
 import React, {
   useEffect,
   useState,
@@ -19,9 +20,26 @@ import {
   Row,
   Col,
   Tooltip,
-  Space
+  Space,
+  Modal,
+  Dropdown,
+  Menu
 } from "antd";
-import { PlusOutlined, CalendarOutlined } from "@ant-design/icons";
+import {
+  PlusOutlined,
+  CalendarOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  EyeOutlined,
+  FilterOutlined,
+  ReloadOutlined,
+  ExclamationCircleOutlined,
+  UserOutlined,
+  TeamOutlined,
+  ClockCircleOutlined,
+  CheckCircleOutlined,
+  PlayCircleOutlined
+} from "@ant-design/icons";
 import axios from "../../api/axios";
 import moment from "moment";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
@@ -32,7 +50,9 @@ import TaskDetailsDrawer from "./TaskDetailsDrawer";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
+const { confirm } = Modal;
 
+// Status configuration
 const STATUS_ORDER = [
   "To Do",
   "In Progress",
@@ -44,32 +64,48 @@ const STATUS_ORDER = [
 const STATUS_COLORS = {
   "To Do": "red",
   "In Progress": "orange",
-  Review: "blue",
-  Completed: "green",
-  Overdue: "#7f00ff"
+  "Review": "blue",
+  "Completed": "green",
+  "Overdue": "purple"
+};
+
+const STATUS_ICONS = {
+  "To Do": <ClockCircleOutlined />,
+  "In Progress": <PlayCircleOutlined />,
+  "Review": <EyeOutlined />,
+  "Completed": <CheckCircleOutlined />,
+  "Overdue": <ExclamationCircleOutlined />
 };
 
 const TaskBoard = () => {
   /* ================= STATE ================= */
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
+  // Filters
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
   const [filterAssignedTo, setFilterAssignedTo] = useState("");
+  const [filterPriority, setFilterPriority] = useState("");
+  const [dateRange, setDateRange] = useState(null);
+  const [showFilters, setShowFilters] = useState(false);
+
+  // Users for filter
   const [allUsers, setAllUsers] = useState([]);
 
+  // Drawers
   const [detailsVisible, setDetailsVisible] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [drawerEditingTask, setDrawerEditingTask] = useState(null);
 
-  const currentUser =
-    JSON.parse(localStorage.getItem("user")) || {
-      role: "Employee",
-      _id: "temp",
-      name: "Unknown"
-    };
+  // Current user
+  const currentUser = JSON.parse(localStorage.getItem("user")) || {
+    role: "Employee",
+    _id: "temp",
+    name: "Unknown"
+  };
 
   const isPrivileged = [
     "Admin",
@@ -78,13 +114,13 @@ const TaskBoard = () => {
     "Team Leader"
   ].includes(currentUser.role);
 
-  /* ================= USERS ================= */
+  /* ================= FETCH USERS ================= */
   const fetchUsers = useCallback(async () => {
     try {
       const res = await axios.get("/api/users");
       setAllUsers(Array.isArray(res.data) ? res.data : []);
     } catch (e) {
-      console.error(e);
+      console.error("Failed to fetch users:", e);
     }
   }, []);
 
@@ -92,29 +128,34 @@ const TaskBoard = () => {
     fetchUsers();
   }, [fetchUsers]);
 
-  /* ================= TASKS ================= */
+  /* ================= FETCH TASKS ================= */
   const fetchTasks = useCallback(
-    async (opts = {}) => {
-      setLoading(true);
+    async (showRefreshing = false) => {
+      if (showRefreshing) setRefreshing(true);
+      else setLoading(true);
+
       try {
         const params = new URLSearchParams();
 
-        const qSearch = opts.search ?? search;
-        const qStatus = opts.status ?? filterStatus;
-        const qAssignedTo = opts.assignedTo ?? filterAssignedTo;
-
-        if (!isPrivileged && !qAssignedTo) {
+        // Add filters to params
+        if (!isPrivileged && !filterAssignedTo) {
           params.append("assignedTo", currentUser._id);
-        } else if (qAssignedTo) {
-          params.append("assignedTo", qAssignedTo);
+        } else if (filterAssignedTo) {
+          params.append("assignedTo", filterAssignedTo);
         }
 
-        if (qStatus) params.append("status", qStatus);
-        if (qSearch) params.append("search", qSearch);
+        if (filterStatus) params.append("status", filterStatus);
+        if (search) params.append("search", search);
+        if (filterPriority) params.append("isImportant", filterPriority === "important");
 
-        const res = await axios.get(
-          `/api/tasks?${params.toString()}`
-        );
+        // Add date range if selected
+        if (dateRange && dateRange[0] && dateRange[1]) {
+          params.append("startDate", dateRange[0].format("YYYY-MM-DD"));
+          params.append("endDate", dateRange[1].format("YYYY-MM-DD"));
+        }
+
+        console.log("Fetching tasks with params:", params.toString());
+        const res = await axios.get(`/api/tasks?${params.toString()}`);
 
         const rawTasks = Array.isArray(res.data)
           ? res.data
@@ -122,7 +163,7 @@ const TaskBoard = () => {
           ? res.data.tasks
           : [];
 
-        /* 🔥 IMPORTANT FIX — NORMALIZE assignedTo */
+        // Normalize assignedTo to always be an array
         const normalizedTasks = rawTasks.map((t) => ({
           ...t,
           assignedTo: Array.isArray(t.assignedTo)
@@ -133,57 +174,65 @@ const TaskBoard = () => {
         }));
 
         setTasks(normalizedTasks);
+        if (showRefreshing) message.success("Tasks refreshed");
       } catch (e) {
-        console.error(e);
+        console.error("Error fetching tasks:", e);
         message.error("Failed to load tasks");
         setTasks([]);
       } finally {
         setLoading(false);
+        setRefreshing(false);
       }
     },
     [
       search,
       filterStatus,
       filterAssignedTo,
+      filterPriority,
+      dateRange,
       currentUser._id,
       isPrivileged
     ]
   );
 
+  // Initial fetch
   useEffect(() => {
     fetchTasks();
   }, [fetchTasks]);
 
+  // Debounced search
   useEffect(() => {
-    const t = setTimeout(() => {
-      fetchTasks({
-        search,
-        status: filterStatus,
-        assignedTo: filterAssignedTo
-      });
-    }, 300);
-    return () => clearTimeout(t);
-  }, [search, filterStatus, filterAssignedTo, fetchTasks]);
+    const timer = setTimeout(() => {
+      fetchTasks();
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [search, filterStatus, filterAssignedTo, filterPriority, dateRange]);
 
-  /* ================= GROUP ================= */
+  /* ================= GROUP TASKS BY STATUS ================= */
   const grouped = useMemo(() => {
-    const g = {};
-    STATUS_ORDER.forEach((s) => (g[s] = []));
+    const groups = {};
+    STATUS_ORDER.forEach((status) => (groups[status] = []));
 
-    tasks.forEach((t) => {
-      const overdue =
-        t.dueDate &&
-        moment(t.dueDate).isBefore(moment(), "day") &&
-        t.status !== "Completed";
+    tasks.forEach((task) => {
+      // Check if task is overdue
+      const isOverdue =
+        task.dueDate &&
+        moment(task.dueDate).isBefore(moment(), "day") &&
+        task.status !== "Completed";
 
-      const key = overdue ? "Overdue" : t.status || "To Do";
-      g[key].push(t);
+      const statusKey = isOverdue ? "Overdue" : task.status || "To Do";
+      
+      if (groups[statusKey]) {
+        groups[statusKey].push(task);
+      } else {
+        groups["To Do"].push(task);
+      }
     });
 
-    return g;
+    return groups;
   }, [tasks]);
 
-  /* ================= DRAG ================= */
+  /* ================= DRAG AND DROP ================= */
   const onDragEnd = async ({ source, destination, draggableId }) => {
     if (!destination) return;
     if (
@@ -192,53 +241,255 @@ const TaskBoard = () => {
     )
       return;
 
-    const newStatus =
-      destination.droppableId === "Overdue"
-        ? grouped[source.droppableId][source.index].status
-        : destination.droppableId;
+    const newStatus = destination.droppableId === "Overdue"
+      ? grouped[source.droppableId][source.index].status
+      : destination.droppableId;
+
+    // Optimistically update UI
+    const updatedTasks = tasks.map(task =>
+      task._id === draggableId ? { ...task, status: newStatus } : task
+    );
+    setTasks(updatedTasks);
 
     try {
-      await axios.put(`/api/tasks/${draggableId}`, {
-        status: newStatus
-      });
+      await axios.put(`/api/tasks/${draggableId}`, { status: newStatus });
+      message.success(`Task moved to ${newStatus}`);
+    } catch (error) {
+      // Revert on error
       fetchTasks();
-    } catch {
-      message.error("Failed to update task");
-      fetchTasks();
+      message.error("Failed to update task status");
     }
   };
 
-  /* ================= UI ================= */
-  return (
-    <Card
-      title={<Title level={4}>Task Board</Title>}
-      extra={
-        isPrivileged && (
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => {
-              setDrawerEditingTask(null);
-              setDrawerVisible(true);
-            }}
-          >
-            New Task
-          </Button>
-        )
+  /* ================= DELETE TASK ================= */
+  const showDeleteConfirm = (task) => {
+    confirm({
+      title: "Delete Task",
+      icon: <ExclamationCircleOutlined />,
+      content: `Are you sure you want to delete "${task.title}"?`,
+      okText: "Yes, Delete",
+      okType: "danger",
+      cancelText: "Cancel",
+      centered: true,
+      onOk: async () => {
+        try {
+          await axios.delete(`/api/tasks/${task._id}`);
+          message.success("Task deleted successfully");
+          fetchTasks();
+          if (selectedTask?._id === task._id) {
+            setDetailsVisible(false);
+            setSelectedTask(null);
+          }
+        } catch (error) {
+          message.error("Failed to delete task");
+        }
       }
-    >
-      {/* FILTERS */}
-      <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
-        <Col xs={24} sm={10} md={8} lg={6}>
+    });
+  };
+
+  /* ================= STATISTICS ================= */
+  const getStatistics = useMemo(() => {
+    const total = tasks.length;
+    const completed = tasks.filter(t => t.status === "Completed").length;
+    const inProgress = tasks.filter(t => t.status === "In Progress").length;
+    const todo = tasks.filter(t => t.status === "To Do").length;
+    const overdue = tasks.filter(t => {
+      return t.dueDate &&
+        moment(t.dueDate).isBefore(moment(), "day") &&
+        t.status !== "Completed";
+    }).length;
+    const important = tasks.filter(t => t.isImportant).length;
+
+    return { total, completed, inProgress, todo, overdue, important };
+  }, [tasks]);
+
+  /* ================= RENDER TASK CARD ================= */
+  const renderTaskCard = (task, index) => (
+    <Draggable key={task._id} draggableId={task._id} index={index}>
+      {(provided, snapshot) => (
+        <div
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+          style={{
+            ...provided.draggableProps.style,
+            opacity: snapshot.isDragging ? 0.8 : 1,
+            transform: snapshot.isDragging ? provided.draggableProps.style?.transform : "none"
+          }}
+        >
+          <Badge.Ribbon
+            text={task.isImportant ? "IMPORTANT" : null}
+            color={task.isImportant ? "red" : "transparent"}
+            style={{ display: task.isImportant ? "block" : "none" }}
+          >
+            <div className="task-card-item" onClick={() => {
+              setSelectedTask(task);
+              setDetailsVisible(true);
+            }}>
+              {/* Task Header */}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                <Title level={5} style={{ margin: 0, flex: 1 }}>
+                  {task.title}
+                </Title>
+                <Tag color={STATUS_COLORS[task.status]} style={{ marginLeft: 8 }}>
+                  {STATUS_ICONS[task.status]} {task.status}
+                </Tag>
+              </div>
+
+              {/* Description Preview */}
+              {task.description && (
+                <Text type="secondary" style={{ fontSize: 12, display: "block", marginTop: 4 }}>
+                  {task.description.length > 60
+                    ? task.description.slice(0, 60) + "..."
+                    : task.description}
+                </Text>
+              )}
+
+              {/* Assigned Users and Due Date */}
+              <div style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginTop: 12
+              }}>
+                <Avatar.Group
+                  maxCount={3}
+                  size="small"
+                  maxStyle={{ color: "#f56a00", backgroundColor: "#fde3cf", cursor: "pointer" }}
+                >
+                  {task.assignedTo.map((user) => (
+                    <Tooltip title={user.name || "Unknown"} key={user._id}>
+                      <Avatar src={user.profileImage} style={{ backgroundColor: "#1677ff" }}>
+                        {user.name?.charAt(0)?.toUpperCase() || "U"}
+                      </Avatar>
+                    </Tooltip>
+                  ))}
+                </Avatar.Group>
+
+                <Space size={4}>
+                  <CalendarOutlined style={{ color: "#8c8c8c", fontSize: 12 }} />
+                  <Text style={{ fontSize: 12, color: "#8c8c8c" }}>
+                    {task.dueDate
+                      ? moment(task.dueDate).format("MMM Do")
+                      : "No due date"}
+                  </Text>
+                </Space>
+              </div>
+
+              {/* Quick Actions */}
+              <div style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: 8,
+                marginTop: 8,
+                borderTop: "1px solid #f0f0f0",
+                paddingTop: 8
+              }}>
+                <Tooltip title="View Details">
+                  <Button
+                    type="text"
+                    size="small"
+                    icon={<EyeOutlined />}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedTask(task);
+                      setDetailsVisible(true);
+                    }}
+                  />
+                </Tooltip>
+                {isPrivileged && (
+                  <>
+                    <Tooltip title="Edit">
+                      <Button
+                        type="text"
+                        size="small"
+                        icon={<EditOutlined />}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDrawerEditingTask(task);
+                          setDrawerVisible(true);
+                        }}
+                      />
+                    </Tooltip>
+                    <Tooltip title="Delete">
+                      <Button
+                        type="text"
+                        size="small"
+                        danger
+                        icon={<DeleteOutlined />}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          showDeleteConfirm(task);
+                        }}
+                      />
+                    </Tooltip>
+                  </>
+                )}
+              </div>
+            </div>
+          </Badge.Ribbon>
+        </div>
+      )}
+    </Draggable>
+  );
+
+  /* ================= RENDER STATS CARDS ================= */
+  const renderStats = () => (
+    <Row gutter={16} style={{ marginBottom: 16 }}>
+      <Col span={4}>
+        <Card size="small" style={{ textAlign: "center", background: "#f0f5ff" }}>
+          <Text type="secondary">Total</Text>
+          <Title level={3} style={{ margin: 0, color: "#1890ff" }}>{getStatistics.total}</Title>
+        </Card>
+      </Col>
+      <Col span={4}>
+        <Card size="small" style={{ textAlign: "center", background: "#fff7e6" }}>
+          <Text type="secondary">To Do</Text>
+          <Title level={3} style={{ margin: 0, color: "#fa8c16" }}>{getStatistics.todo}</Title>
+        </Card>
+      </Col>
+      <Col span={4}>
+        <Card size="small" style={{ textAlign: "center", background: "#e6f7ff" }}>
+          <Text type="secondary">In Progress</Text>
+          <Title level={3} style={{ margin: 0, color: "#13c2c2" }}>{getStatistics.inProgress}</Title>
+        </Card>
+      </Col>
+      <Col span={4}>
+        <Card size="small" style={{ textAlign: "center", background: "#f6ffed" }}>
+          <Text type="secondary">Completed</Text>
+          <Title level={3} style={{ margin: 0, color: "#52c41a" }}>{getStatistics.completed}</Title>
+        </Card>
+      </Col>
+      <Col span={4}>
+        <Card size="small" style={{ textAlign: "center", background: "#fff1f0" }}>
+          <Text type="secondary">Overdue</Text>
+          <Title level={3} style={{ margin: 0, color: "#f5222d" }}>{getStatistics.overdue}</Title>
+        </Card>
+      </Col>
+      <Col span={4}>
+        <Card size="small" style={{ textAlign: "center", background: "#f9f0ff" }}>
+          <Text type="secondary">Important</Text>
+          <Title level={3} style={{ margin: 0, color: "#722ed1" }}>{getStatistics.important}</Title>
+        </Card>
+      </Col>
+    </Row>
+  );
+
+  /* ================= RENDER FILTERS ================= */
+  const renderFilters = () => (
+    <Card size="small" style={{ marginBottom: 16, background: "#fafafa" }}>
+      <Row gutter={[12, 12]} align="middle">
+        <Col xs={24} sm={8} md={6} lg={5}>
           <Input.Search
-            placeholder="Search task..."
+            placeholder="Search tasks..."
             allowClear
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            prefix={<FilterOutlined style={{ color: "#bfbfbf" }} />}
           />
         </Col>
 
-        <Col xs={12} sm={6} md={5} lg={4}>
+        <Col xs={12} sm={5} md={4} lg={3}>
           <Select
             placeholder="Status"
             allowClear
@@ -249,180 +500,200 @@ const TaskBoard = () => {
             <Option value="">All</Option>
             {STATUS_ORDER.map((s) => (
               <Option key={s} value={s}>
-                {s}
+                {STATUS_ICONS[s]} {s}
               </Option>
             ))}
           </Select>
         </Col>
 
-        <Col xs={12} sm={8} md={6} lg={6}>
+        <Col xs={12} sm={5} md={4} lg={3}>
           <Select
-            placeholder="Assigned To"
+            placeholder="Priority"
             allowClear
-            showSearch
-            value={filterAssignedTo}
-            onChange={setFilterAssignedTo}
-            optionFilterProp="children"
+            value={filterPriority}
+            onChange={setFilterPriority}
             style={{ width: "100%" }}
           >
             <Option value="">All</Option>
-            {allUsers.map((u) => (
-              <Option key={u._id} value={u._id}>
-                {u.name}
-              </Option>
-            ))}
+            <Option value="important">Important</Option>
+            <Option value="normal">Normal</Option>
           </Select>
+        </Col>
+
+        {isPrivileged && (
+          <Col xs={24} sm={6} md={5} lg={4}>
+            <Select
+              placeholder="Assigned To"
+              allowClear
+              showSearch
+              value={filterAssignedTo}
+              onChange={setFilterAssignedTo}
+              optionFilterProp="children"
+              style={{ width: "100%" }}
+            >
+              <Option value="">All Users</Option>
+              {allUsers.map((u) => (
+                <Option key={u._id} value={u._id}>
+                  <Space>
+                    <Avatar src={u.profileImage} size="small">
+                      {u.name?.charAt(0).toUpperCase()}
+                    </Avatar>
+                    {u.name}
+                  </Space>
+                </Option>
+              ))}
+            </Select>
+          </Col>
+        )}
+
+        <Col xs={24} sm={24} md={5} lg={4}>
+          <Space>
+            <Button
+              icon={<ReloadOutlined />}
+              onClick={() => fetchTasks(true)}
+              loading={refreshing}
+            >
+              Refresh
+            </Button>
+            {isPrivileged && (
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={() => {
+                  setDrawerEditingTask(null);
+                  setDrawerVisible(true);
+                }}
+              >
+                New Task
+              </Button>
+            )}
+          </Space>
         </Col>
       </Row>
 
-      {loading ? (
-        <Spin style={{ display: "block", margin: "40px auto" }} />
-      ) : (
-        <DragDropContext onDragEnd={onDragEnd}>
-          <div className="kanban-board-row">
-            {STATUS_ORDER.map((status) => (
-              <div key={status} className="kanban-column">
-                <Card
-                  size="small"
-                  title={
-                    <Space>
-                      <Title
-                        level={5}
-                        style={{
-                          margin: 0,
-                          color: STATUS_COLORS[status]
-                        }}
-                      >
-                        {status}
-                      </Title>
-                      <Tag>{grouped[status].length}</Tag>
-                    </Space>
-                  }
-                >
-                  <Droppable droppableId={status}>
-                    {(p) => (
-                      <div
-                        ref={p.innerRef}
-                        {...p.droppableProps}
-                        className="task-list"
-                      >
-                        {grouped[status].map((task, index) => (
-                          <Draggable
-                            key={task._id}
-                            draggableId={task._id}
-                            index={index}
-                          >
-                            {(prov) => (
-                              <div
-                                ref={prov.innerRef}
-                                {...prov.draggableProps}
-                                {...prov.dragHandleProps}
-                              >
-                                {task.isImportant ? (
-                                  <Badge.Ribbon text="IMPORTANT">
-                                    <TaskCard
-                                      task={task}
-                                      onClick={() => {
-                                        setSelectedTask(task);
-                                        setDetailsVisible(true);
-                                      }}
-                                    />
-                                  </Badge.Ribbon>
-                                ) : (
-                                  <TaskCard
-                                    task={task}
-                                    onClick={() => {
-                                      setSelectedTask(task);
-                                      setDetailsVisible(true);
-                                    }}
-                                  />
-                                )}
-                              </div>
-                            )}
-                          </Draggable>
-                        ))}
-                        {p.placeholder}
-                        {!grouped[status].length && (
-                          <Empty description="No tasks" />
-                        )}
-                      </div>
-                    )}
-                  </Droppable>
-                </Card>
-              </div>
-            ))}
-          </div>
-        </DragDropContext>
+      {/* Active Filters Display */}
+      {(search || filterStatus || filterAssignedTo || filterPriority) && (
+        <div style={{ marginTop: 12 }}>
+          <Text type="secondary" style={{ marginRight: 8 }}>Active Filters:</Text>
+          {search && <Tag closable onClose={() => setSearch("")}>Search: {search}</Tag>}
+          {filterStatus && <Tag closable onClose={() => setFilterStatus("")}>Status: {filterStatus}</Tag>}
+          {filterPriority && <Tag closable onClose={() => setFilterPriority("")}>Priority: {filterPriority}</Tag>}
+          {filterAssignedTo && (
+            <Tag closable onClose={() => setFilterAssignedTo("")}>
+              Assigned to: {allUsers.find(u => u._id === filterAssignedTo)?.name}
+            </Tag>
+          )}
+        </div>
       )}
+    </Card>
+  );
 
+  return (
+    <div style={{ padding: "24px" }}>
+      {/* Header */}
+      <div style={{ marginBottom: 16 }}>
+        <Title level={2} style={{ margin: 0 }}>Task Board</Title>
+        <Text type="secondary">Manage and track your team's tasks</Text>
+      </div>
+
+      {/* Statistics */}
+      {renderStats()}
+
+      {/* Filters */}
+      {renderFilters()}
+
+      {/* Main Content */}
+      <Card bordered={false} style={{ borderRadius: 8 }}>
+        {loading ? (
+          <div style={{ textAlign: "center", padding: "40px" }}>
+            <Spin size="large" tip="Loading tasks..." />
+          </div>
+        ) : (
+          <DragDropContext onDragEnd={onDragEnd}>
+            <div className="kanban-board-row">
+              {STATUS_ORDER.map((status) => (
+                <div key={status} className="kanban-column">
+                  <Card
+                    size="small"
+                    title={
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <Space>
+                          {STATUS_ICONS[status]}
+                          <Text strong style={{ color: STATUS_COLORS[status] }}>
+                            {status}
+                          </Text>
+                        </Space>
+                        <Tag color={STATUS_COLORS[status]}>{grouped[status].length}</Tag>
+                      </div>
+                    }
+                    style={{ height: "100%" }}
+                    bodyStyle={{ padding: "8px" }}
+                  >
+                    <Droppable droppableId={status}>
+                      {(provided, snapshot) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.droppableProps}
+                          className="task-list"
+                          style={{
+                            backgroundColor: snapshot.isDraggingOver ? "#f0f5ff" : "transparent",
+                            transition: "background-color 0.2s ease"
+                          }}
+                        >
+                          {grouped[status].map((task, index) => renderTaskCard(task, index))}
+                          {provided.placeholder}
+                          {grouped[status].length === 0 && (
+                            <Empty
+                              description={`No ${status} tasks`}
+                              style={{ padding: "20px 0" }}
+                            />
+                          )}
+                        </div>
+                      )}
+                    </Droppable>
+                  </Card>
+                </div>
+              ))}
+            </div>
+          </DragDropContext>
+        )}
+      </Card>
+
+      {/* Task Details Drawer */}
       <TaskDetailsDrawer
         visible={detailsVisible}
         task={selectedTask}
-        onClose={() => setDetailsVisible(false)}
-        onEdit={(t) => {
-          setDrawerEditingTask(t);
+        onClose={() => {
+          setDetailsVisible(false);
+          setSelectedTask(null);
+        }}
+        onEdit={(task) => {
+          setDrawerEditingTask(task);
           setDrawerVisible(true);
           setDetailsVisible(false);
         }}
-        onDeleted={fetchTasks}
+        onDeleted={() => {
+          fetchTasks();
+          setSelectedTask(null);
+        }}
       />
 
+      {/* Task Form Drawer */}
       <TaskForm
         visible={drawerVisible}
         editing={drawerEditingTask}
-        onClose={() => setDrawerVisible(false)}
+        onClose={() => {
+          setDrawerVisible(false);
+          setDrawerEditingTask(null);
+        }}
         onSaved={() => {
           setDrawerVisible(false);
+          setDrawerEditingTask(null);
           fetchTasks();
         }}
       />
-    </Card>
+    </div>
   );
 };
-
-/* ================= TASK CARD ================= */
-const TaskCard = ({ task, onClick }) => (
-  <div className="task-card-item" onClick={onClick}>
-    <Title level={5} style={{ marginBottom: 6 }}>
-      {task.title}
-    </Title>
-
-    {task.description && (
-      <Text type="secondary" style={{ fontSize: 12 }}>
-        {task.description.length > 80
-          ? task.description.slice(0, 80) + "..."
-          : task.description}
-      </Text>
-    )}
-
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        marginTop: 10
-      }}
-    >
-      <Avatar.Group maxCount={4} size="small">
-        {task.assignedTo.map((u) => (
-          <Tooltip title={u.name} key={u._id}>
-            <Avatar src={u.profileImage || undefined}>
-              {u.name?.charAt(0)?.toUpperCase()}
-            </Avatar>
-          </Tooltip>
-        ))}
-      </Avatar.Group>
-
-      <Space>
-        <CalendarOutlined />
-        <Text style={{ fontSize: 12 }}>
-          {task.dueDate
-            ? moment(task.dueDate).format("MMM Do")
-            : "No Due"}
-        </Text>
-      </Space>
-    </div>
-  </div>
-);
 
 export default TaskBoard;

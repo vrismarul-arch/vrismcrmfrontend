@@ -9,7 +9,7 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     const URL =
-      import.meta.env.VITE_SOCKET_URL || "http://localhost:5001";
+      import.meta.env.VITE_SOCKET_URL || "http://localhost:1001";
 
     socketRef.current = io(URL, {
       transports: ["websocket", "polling"],

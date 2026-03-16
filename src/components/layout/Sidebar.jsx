@@ -45,7 +45,7 @@ const Sidebar = ({ collapsed }) => {
       key: "/dashboard",
       icon: <DashboardOutlined />,
       label: "Dashboard",
-      roles: ["Admin", "Superadmin", "Employee", "Team Leader"],
+      roles: ["Admin", "Superadmin", "Employee", "Team Leader","Client"],
       children: [
         {
           key: "/eodreport",
@@ -65,7 +65,8 @@ const Sidebar = ({ collapsed }) => {
           roles: ["Admin", "Superadmin", "Team Leader", "Employee"],
           icon: <ScheduleOutlined />, // Added Icon
         }
-        
+        ,        { key: "/content", label: "Content Dashboard", roles: ["Admin", "Superadmin", "Team Leader", "Employee","Client"], icon: <ScheduleOutlined /> },
+
       ],
     },
     {

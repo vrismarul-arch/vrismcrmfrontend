@@ -18,6 +18,7 @@ import SubscriptionManagement from "../pages/clients/SubscriptionManagement";
 
 // ⭐ ReactFlow Provider Fix
 import { ReactFlowProvider } from "reactflow";
+import MonthlyContentDashboard from "../pages/content/MonthlyContentDashboard";
 
 // Lazy Pages
 const Dashboard = React.lazy(() => import("../pages/dashboard/Dashboard"));
@@ -100,6 +101,7 @@ export const appRoutes = [
 
   // Task Routes
   { path: "/taskboard", element: <RoleGuard allowedRoles={['Admin','Superadmin','Client','Employee','Team Leader']}><TaskBoard/></RoleGuard> },
+  { path: "/content", element: <RoleGuard allowedRoles={['Admin','Superadmin','Client','Employee','Team Leader']}><MonthlyContentDashboard/></RoleGuard> },
   { path: "/taskmanage", element: <RoleGuard allowedRoles={['Admin','Superadmin','Client','Employee','Team Leader']}><TaskBoard/></RoleGuard> },
 
   { path: "/chat", element: <RoleGuard allowedRoles={['Admin','Superadmin','Client','Employee','Team Leader']}><Chat/></RoleGuard> },

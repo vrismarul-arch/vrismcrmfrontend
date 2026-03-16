@@ -166,3 +166,201 @@
     padding: 3px 8px;
   }
 }
+/* src/pages/TaskManagement.css */
+
+.kanban-board-row {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding: 8px 0;
+  min-height: 70vh;
+}
+
+.kanban-column {
+  flex: 1;
+  min-width: 280px;
+  max-width: 350px;
+}
+
+.task-list {
+  min-height: 400px;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.task-card-item {
+  background: white;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.task-card-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+  border-color: #1890ff;
+}
+
+.task-card-item:active {
+  transform: translateY(0);
+}
+
+/* Drag and drop styles */
+.task-card-item.dragging {
+  opacity: 0.5;
+  transform: scale(0.95);
+}
+
+/* Custom scrollbar for kanban board */
+.kanban-board-row::-webkit-scrollbar {
+  height: 8px;
+}
+
+.kanban-board-row::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 4px;
+}
+
+.kanban-board-row::-webkit-scrollbar-thumb {
+  background: #bfbfbf;
+  border-radius: 4px;
+}
+
+.kanban-board-row::-webkit-scrollbar-thumb:hover {
+  background: #8c8c8c;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .kanban-board-row {
+    flex-direction: column;
+    overflow-x: hidden;
+  }
+  
+  .kanban-column {
+    max-width: 100%;
+    margin-bottom: 16px;
+  }
+  
+  .task-list {
+    min-height: 200px;
+  }
+}
+
+/* Animation for new tasks */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.task-card-item {
+  animation: slideIn 0.3s ease;
+}
+
+/* Status badges */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+/* Loading state */
+.task-board-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: #8c8c8c;
+}
+
+/* Quick actions hover effect */
+.task-card-item .ant-btn-text {
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+.task-card-item:hover .ant-btn-text {
+  opacity: 1;
+}
+
+/* Priority indicators */
+.priority-high {
+  border-left: 3px solid #f5222d;
+}
+
+.priority-medium {
+  border-left: 3px solid #faad14;
+}
+
+.priority-low {
+  border-left: 3px solid #52c41a;
+}
+
+/* Due date indicators */
+.due-today {
+  color: #faad14;
+  font-weight: 500;
+}
+
+.due-overdue {
+  color: #f5222d;
+  font-weight: 500;
+}
+
+.due-completed {
+  color: #52c41a;
+}
+
+/* Avatar group tooltip */
+.avatar-group-tooltip {
+  max-width: 200px;
+  word-wrap: break-word;
+}
+
+/* Statistics cards hover effect */
+.ant-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Filter section */
+.filter-section {
+  background: #fafafa;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+/* Drag handle indicator */
+.drag-handle {
+  cursor: grab;
+  color: #bfbfbf;
+  transition: color 0.2s ease;
+}
+
+.drag-handle:hover {
+  color: #1890ff;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}

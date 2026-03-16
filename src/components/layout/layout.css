@@ -76,7 +76,6 @@
   background: #fff;
   min-height: 360px;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
 }
 
 /* ============================
@@ -90,10 +89,10 @@
   .main-content {
     margin: 8px;
   }
-
-  .inner-content {
-    padding: 16px;
-  }
+.inner-content {
+  padding: 4px;
+  
+}
 
   .sidebar-logo-img {
     height: 32px;
@@ -129,7 +128,7 @@
 
 /* Top Navbar Styling */
 .top-navbar {
-  padding: 0 24px;
+  
   align-items: center;
   border-bottom: 1px solid #f0f0f0;
   height: 64px;

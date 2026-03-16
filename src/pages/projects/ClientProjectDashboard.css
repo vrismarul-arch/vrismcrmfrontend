@@ -1,0 +1,814 @@
+/* ClientProjectDashboard.css - Mobile Optimized */
+
+/* Base Styles */
+.dashboard-wrapper {
+  padding: 12px;
+  min-height: 100vh;
+  background: #f5f7fa;
+}
+
+/* Mobile First Approach - Base styles for mobile */
+.dashboard-header {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.page-title {
+  font-size: 24px !important;
+  margin-bottom: 4px !important;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.version-tag {
+  font-size: 11px;
+  padding: 2px 8px;
+}
+
+.header-actions {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  width: 100%;
+}
+
+.header-actions button {
+  width: 100%;
+  height: 44px;
+  border-radius: 22px;
+  font-size: 15px;
+}
+
+/* Statistics Cards - Mobile Optimized */
+.stats-row {
+  margin: 0 -4px 16px -4px;
+}
+
+.stats-row .ant-col {
+  padding: 0 4px !important;
+}
+
+.stat-card {
+  border-radius: 16px;
+  padding: 12px;
+  margin-bottom: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.stat-card .ant-statistic-title {
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.stat-card .ant-statistic-content {
+  font-size: 24px !important;
+}
+
+.stat-footer {
+  font-size: 11px;
+  margin-top: 8px;
+}
+
+/* Main Content Card */
+.main-content-card {
+  border-radius: 20px;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.main-content-card .ant-card-body {
+  padding: 0;
+}
+
+/* Tabs - Mobile Optimized */
+.dashboard-tabs .ant-tabs-nav {
+  margin-bottom: 16px;
+  background: white;
+  padding: 8px 12px 0;
+  border-radius: 20px 20px 0 0;
+}
+
+.dashboard-tabs .ant-tabs-tab {
+  padding: 8px 0;
+  font-size: 14px;
+}
+
+.dashboard-tabs .ant-tabs-tab + .ant-tabs-tab {
+  margin-left: 16px;
+}
+
+/* Project Cards - Mobile Optimized */
+.project-list .ant-list-item {
+  padding: 8px 0;
+}
+
+.project-card {
+  border-radius: 20px;
+  padding: 16px;
+  margin: 0;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.project-header {
+  flex-direction: row;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.project-name {
+  font-size: 18px !important;
+  margin-bottom: 8px !important;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.overdue-badge .ant-badge-count {
+  font-size: 11px;
+  height: 18px;
+  line-height: 18px;
+  padding: 0 6px;
+  min-width: 18px;
+}
+
+.project-meta {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.status-tag {
+  font-size: 12px;
+  padding: 2px 10px;
+}
+
+/* Progress Section */
+.progress-section {
+  margin-bottom: 20px;
+}
+
+.progress-header {
+  margin-bottom: 6px;
+}
+
+.progress-percent {
+  font-size: 14px;
+}
+
+.custom-progress {
+  margin-bottom: 8px;
+}
+
+/* Steps Preview - Mobile Optimized */
+.steps-preview {
+  padding: 12px;
+  border-radius: 16px;
+  margin-bottom: 16px;
+}
+
+.step-item {
+  padding: 8px;
+  margin-bottom: 4px;
+  border-radius: 12px;
+  flex-wrap: wrap;
+}
+
+.step-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.step-name {
+  font-size: 13px;
+  line-height: 1.4;
+  margin-bottom: 2px;
+}
+
+.step-date {
+  font-size: 10px;
+}
+
+.step-status {
+  font-size: 10px;
+  padding: 0 6px;
+  height: 20px;
+  line-height: 20px;
+}
+
+.view-all-btn {
+  width: 100%;
+  text-align: center;
+  height: 36px;
+  font-size: 13px;
+}
+
+/* Project Sidebar - Mobile Optimized */
+.project-sidebar {
+  padding: 12px;
+  border-radius: 16px;
+  margin-top: 12px;
+}
+
+.team-section {
+  margin-bottom: 12px;
+}
+
+.team-section .ant-avatar {
+  width: 32px;
+  height: 32px;
+  font-size: 14px;
+}
+
+.service-tag {
+  font-size: 12px;
+  padding: 4px 12px;
+}
+
+.alert-section {
+  padding: 10px;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+/* Mobile Steps Timeline */
+.steps-timeline {
+  margin-top: 20px;
+}
+
+.timeline-divider {
+  margin: 12px 0;
+}
+
+.desktop-steps {
+  display: none;
+}
+
+.mobile-steps {
+  display: block;
+}
+
+.mobile-step-item {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  cursor: pointer;
+}
+
+.step-indicator {
+  position: relative;
+  width: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.step-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #d9d9d9;
+  z-index: 1;
+}
+
+.step-dot.completed {
+  background: #52c41a;
+}
+
+.step-dot.in-progress {
+  background: #007aff;
+  animation: pulse 1.5s infinite;
+}
+
+.step-dot.review {
+  background: #faad14;
+}
+
+.step-line {
+  position: absolute;
+  top: 16px;
+  width: 2px;
+  height: calc(100% + 16px);
+  background: #e8eef4;
+}
+
+.step-content {
+  flex: 1;
+  background: #f8fafc;
+  padding: 12px;
+  border-radius: 12px;
+}
+
+.step-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.step-header .ant-typography {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.step-status-tag {
+  font-size: 10px;
+  padding: 2px 6px;
+  height: 20px;
+  line-height: 16px;
+}
+
+.step-due {
+  font-size: 11px;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.step-desc {
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 0 !important;
+}
+
+/* Sidebar Content - Mobile Optimized */
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.sidebar-card {
+  border-radius: 20px;
+  padding: 0;
+  background: white;
+}
+
+.sidebar-card .ant-card-head {
+  padding: 16px 16px 0;
+  min-height: auto;
+  border-bottom: none;
+}
+
+.sidebar-card .ant-card-head-title {
+  font-size: 16px;
+  padding: 0;
+}
+
+.sidebar-card .ant-card-body {
+  padding: 12px 16px 16px;
+}
+
+/* Deadlines Timeline */
+.deadline-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 4px 0;
+}
+
+.deadline-item .ant-typography {
+  font-size: 13px;
+}
+
+.deadline-item .ant-tag {
+  font-size: 10px;
+  padding: 2px 8px;
+  margin: 0;
+}
+
+/* Activity Timeline */
+.activity-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 4px 0;
+}
+
+.activity-item .ant-typography {
+  font-size: 13px;
+}
+
+.activity-time {
+  font-size: 10px;
+  margin-left: 0;
+}
+
+/* Quick Stats */
+.quick-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.stat-item {
+  padding: 10px;
+  border-radius: 12px;
+}
+
+.stat-item .ant-typography:first-child {
+  font-size: 11px;
+}
+
+.stat-item .ant-typography:last-child {
+  font-size: 16px;
+}
+
+/* Steps Table - Mobile Optimized */
+.steps-table {
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.steps-table .ant-table {
+  font-size: 12px;
+}
+
+.steps-table .ant-table-cell {
+  padding: 12px 8px;
+}
+
+.steps-table .ant-btn-link {
+  padding: 0;
+  font-size: 12px;
+  height: auto;
+}
+
+.steps-table .ant-tag {
+  font-size: 10px;
+  padding: 2px 6px;
+  margin: 0;
+}
+
+/* Drawer - Mobile Optimized */
+.step-drawer .ant-drawer-content-wrapper {
+  width: 100% !important;
+  max-width: 100%;
+}
+
+.step-drawer .ant-drawer-header {
+  padding: 16px 20px;
+}
+
+.drawer-header {
+  font-size: 16px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.step-details {
+  padding: 8px 0;
+}
+
+.detail-section {
+  margin-bottom: 20px;
+}
+
+.section-label {
+  font-size: 11px;
+  margin-bottom: 6px;
+}
+
+.detail-value {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.url-container {
+  padding: 10px;
+  border-radius: 12px;
+  flex-wrap: wrap;
+}
+
+.due-date, .updated-date {
+  padding: 10px;
+  border-radius: 12px;
+}
+
+.drawer-actions {
+  gap: 10px;
+}
+
+.drawer-actions button {
+  height: 44px;
+  font-size: 15px;
+}
+
+/* Modal - Mobile Optimized */
+.step-modal {
+  max-width: 100%;
+  margin: 12px;
+}
+
+.step-modal .ant-modal-content {
+  border-radius: 24px;
+}
+
+.step-modal .ant-modal-header {
+  padding: 16px 20px;
+  border-radius: 24px 24px 0 0;
+}
+
+.modal-header {
+  font-size: 16px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.step-modal .ant-modal-body {
+  padding: 20px;
+}
+
+.detail-card {
+  border-radius: 16px;
+  margin-bottom: 0;
+}
+
+.detail-card .ant-card-body {
+  padding: 16px;
+}
+
+.detail-card .ant-typography h5 {
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+/* Export Modal */
+.export-modal .ant-modal-content {
+  border-radius: 24px;
+}
+
+.export-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.export-options .ant-select {
+  height: 44px;
+}
+
+.export-options .ant-select-selector {
+  border-radius: 22px !important;
+}
+
+.export-options button {
+  height: 44px;
+  border-radius: 22px;
+  font-size: 15px;
+  margin: 0 !important;
+}
+
+/* Animations */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 122, 255, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(0, 122, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 122, 255, 0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.project-list-item {
+  animation: slideIn 0.3s ease forwards;
+}
+
+/* Touch-friendly improvements */
+button, 
+.ant-btn,
+.step-item,
+.mobile-step-item,
+.ant-list-item {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:active,
+.ant-btn:active,
+.step-item:active,
+.mobile-step-item:active {
+  opacity: 0.7;
+}
+
+/* Improve scrollbar on mobile */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+/* Loading state */
+.loading-state {
+  padding: 32px 16px;
+  text-align: center;
+}
+
+/* Empty state */
+.ant-empty {
+  padding: 24px 12px;
+}
+
+.ant-empty-description {
+  font-size: 13px;
+}
+
+/* Tablet Styles */
+@media screen and (min-width: 768px) and (max-width: 1024px) {
+  .dashboard-wrapper {
+    padding: 20px;
+  }
+
+  .dashboard-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .header-actions {
+    flex-direction: column;
+    width: auto;
+  }
+
+  .header-actions button {
+    width: auto;
+    min-width: 100px;
+  }
+
+  .stats-row .ant-col {
+    padding: 0 8px !important;
+  }
+
+  .project-meta {
+    flex-direction: row;
+  }
+
+  .desktop-steps {
+    display: flex;
+  }
+
+  .mobile-steps {
+    display: none;
+  }
+
+  .sidebar-content {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .sidebar-card {
+    flex: 1;
+    min-width: 250px;
+  }
+}
+
+/* Small phones */
+@media screen and (max-width: 375px) {
+  .dashboard-wrapper {
+    padding: 8px;
+  }
+
+  .page-title {
+    font-size: 20px !important;
+  }
+
+  .stat-card .ant-statistic-content {
+    font-size: 20px !important;
+  }
+
+  .project-name {
+    font-size: 16px !important;
+  }
+
+  .step-name {
+    font-size: 12px;
+  }
+
+  .step-status-tag {
+    font-size: 9px;
+    padding: 1px 4px;
+  }
+
+  .quick-stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Landscape mode */
+@media screen and (max-height: 480px) and (orientation: landscape) {
+  .step-drawer .ant-drawer-content-wrapper {
+    width: 100% !important;
+  }
+
+  .step-details {
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .dashboard-wrapper {
+    background: #ffffff;
+  }
+
+  .main-content-card,
+  .stat-card,
+  .sidebar-card,
+  .project-card,
+  .steps-table {
+    background: #ffffff;
+    border-color: #333;
+  }
+
+  .steps-preview,
+  .project-sidebar,
+  .step-content,
+  .url-container,
+  .due-date,
+  .updated-date {
+    background: #ffffff;
+  }
+
+  .stat-item {
+    background: #ffffff;
+  }
+
+  .ant-typography {
+    color: #000000;
+  }
+
+  .ant-typography-secondary {
+    color: #a0a0a0;
+  }
+
+  .dashboard-tabs .ant-tabs-nav {
+    background: #ffffff;
+  }
+
+  .step-item:hover,
+  .mobile-step-item:hover {
+    background: #ffffff;
+  }
+}
+
+/* Print styles */
+@media print {
+  .dashboard-wrapper {
+    background: white;
+    padding: 0;
+  }
+
+  .header-actions,
+  .more-btn,
+  .drawer-actions,
+  .ant-tabs-nav,
+  .sidebar-card,
+  .export-btn {
+
+    display: none !important;
+  }
+
+  .project-card {
+    break-inside: avoid;
+    border: 1px solid #ddd;
+    box-shadow: none;
+  }
+
+  .mobile-steps {
+    display: block;
+  }
+}

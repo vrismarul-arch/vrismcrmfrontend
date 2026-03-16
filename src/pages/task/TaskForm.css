@@ -1,59 +1,276 @@
-.zoho-task-drawer .ant-drawer-body {
-  background: #f7f8fa;
-  padding: 20px;
-}
-.preserve-format-textarea textarea {
-  white-space: pre-wrap;
-  word-break: break-word;
-  line-height: 1.6;
-  font-family: inherit;
-}
-.task-description {
-  white-space: pre-wrap;   /* ⭐ THIS IS THE KEY */
-  line-height: 1.6;
-  word-break: break-word;
+/* src/pages/TaskForm.css */
+
+.task-form-drawer .ant-drawer-body {
+  padding: 16px 24px;
+  background: #f5f5f5;
 }
 
-.drawer-header-section {
-  margin-bottom: 10px;
-}
-
-.drawer-title {
-  font-weight: 600;
-}
-
-.zoho-section-card {
-  padding: 18px;
-  border-radius: 12px;
+.task-form-drawer .zoho-section-card {
   margin-bottom: 16px;
-  background: white;
-  border: 1px solid #eee;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  border: 1px solid #f0f0f0;
 }
 
-.zoho-section-card h5 {
-  margin-bottom: 14px;
-  font-weight: 600;
+.task-form-drawer .zoho-section-card .ant-card-head {
+  min-height: 48px;
+  padding: 0 16px;
+  background: #fafafa;
+  border-bottom: 1px solid #f0f0f0;
 }
 
-.zoho-form input,
-.zoho-form .ant-select-selector,
-.zoho-datepicker {
-  border-radius: 8px !important;
-  border-color: #dcdcdc !important;
-  height: 40px !important;
+.task-form-drawer .zoho-section-card .ant-card-head-title {
+  padding: 12px 0;
+  font-size: 14px;
+  font-weight: 500;
 }
 
-.zoho-datepicker {
+.task-form-drawer .zoho-section-card .ant-card-body {
+  padding: 20px 16px;
+}
+
+/* Custom DatePicker styling */
+.custom-datepicker-wrapper {
   width: 100%;
-  padding: 8px;
 }
 
-.drawer-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  padding: 12px 24px;
-  background: white;
-  border-top: 1px solid #eee;
+.custom-datepicker-wrapper .react-datepicker-wrapper {
+  width: 100%;
 }
-            
+
+.custom-datepicker-wrapper .react-datepicker__input-container input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  transition: all 0.3s;
+}
+
+.custom-datepicker-wrapper .react-datepicker__input-container input:hover {
+  border-color: #40a9ff;
+}
+
+.custom-datepicker-wrapper .react-datepicker__input-container input:focus {
+  border-color: #40a9ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  outline: none;
+}
+
+/* Form item spacing */
+.task-form-drawer .ant-form-item {
+  margin-bottom: 16px;
+}
+
+.task-form-drawer .ant-form-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Upload area styling */
+.task-form-drawer .ant-upload-drag {
+  background: #fafafa;
+  border: 2px dashed #d9d9d9;
+  border-radius: 8px;
+  transition: all 0.3s;
+}
+
+.task-form-drawer .ant-upload-drag:hover {
+  border-color: #40a9ff;
+  background: #f6f6f6;
+}
+
+.task-form-drawer .ant-upload-drag p.ant-upload-drag-icon {
+  margin-bottom: 12px;
+}
+
+.task-form-drawer .ant-upload-drag p.ant-upload-text {
+  color: #333;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.task-form-drawer .ant-upload-drag p.ant-upload-hint {
+  color: #999;
+  font-size: 12px;
+}
+
+/* Timeline styling */
+.task-form-drawer .ant-timeline {
+  padding: 8px 0;
+}
+
+.task-form-drawer .ant-timeline-item {
+  padding-bottom: 16px;
+}
+
+.task-form-drawer .ant-timeline-item:last-child {
+  padding-bottom: 0;
+}
+
+.task-form-drawer .ant-timeline-item-content {
+  margin-left: 28px;
+}
+
+/* Step progress styling */
+.task-form-drawer .ant-steps-item-title {
+  font-size: 12px !important;
+}
+
+.task-form-drawer .ant-steps-item-description {
+  font-size: 10px !important;
+}
+
+/* Tag styling */
+.task-form-drawer .ant-tag {
+  border-radius: 12px;
+  padding: 2px 8px;
+}
+
+/* Switch styling */
+.task-form-drawer .ant-switch {
+  background: #bfbfbf;
+}
+
+.task-form-drawer .ant-switch-checked {
+  background: #ff4d4f;
+}
+
+/* Modal styling */
+.task-form-drawer .ant-modal-body {
+  padding: 24px;
+}
+
+.task-form-drawer .ant-modal-confirm-content {
+  margin-top: 16px;
+}
+
+/* Progress bar styling */
+.task-form-drawer .ant-progress-line {
+  margin-bottom: 0;
+}
+
+.task-form-drawer .ant-progress-small .ant-progress-text {
+  font-size: 10px;
+}
+
+/* Input number styling */
+.task-form-drawer .ant-input-number {
+  width: 100%;
+}
+
+/* Avatar group styling */
+.task-form-drawer .ant-avatar-group {
+  margin-right: 8px;
+}
+
+/* Alert styling */
+.task-form-drawer .ant-alert {
+  border-radius: 6px;
+  border: none;
+}
+
+/* Scrollbar styling for notes section */
+.task-form-drawer .ant-card-body div[style*="overflowY"]::-webkit-scrollbar {
+  width: 6px;
+}
+
+.task-form-drawer .ant-card-body div[style*="overflowY"]::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 3px;
+}
+
+.task-form-drawer .ant-card-body div[style*="overflowY"]::-webkit-scrollbar-thumb {
+  background: #bfbfbf;
+  border-radius: 3px;
+}
+
+.task-form-drawer .ant-card-body div[style*="overflowY"]::-webkit-scrollbar-thumb:hover {
+  background: #8c8c8c;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .task-form-drawer {
+    width: 100% !important;
+  }
+  
+  .task-form-drawer .ant-drawer-body {
+    padding: 12px;
+  }
+  
+  .task-form-drawer .zoho-section-card .ant-card-body {
+    padding: 16px 12px;
+  }
+  
+  .task-form-drawer .ant-row {
+    flex-direction: column;
+  }
+  
+  .task-form-drawer .ant-col {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+/* Animation */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.task-form-drawer .zoho-section-card {
+  animation: slideIn 0.3s ease;
+}
+
+/* Loading state */
+.task-form-drawer .loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+/* Empty state */
+.task-form-drawer .empty-state {
+  text-align: center;
+  padding: 40px;
+  color: #8c8c8c;
+}
+
+/* Success animation */
+@keyframes checkmark {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.task-form-drawer .success-icon {
+  animation: checkmark 0.3s ease;
+}
+
+/* Tooltip styling */
+.task-form-drawer .ant-tooltip-inner {
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+/* Drawer footer sticky */
+.task-form-drawer .ant-drawer-footer {
+  position: sticky;
+  bottom: 0;
+  background: white;
+  border-top: 1px solid #f0f0f0;
+  padding: 12px 24px;
+  z-index: 10;
+}

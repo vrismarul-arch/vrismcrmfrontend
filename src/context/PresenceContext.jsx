@@ -12,7 +12,7 @@ export const PresenceProvider = ({ children }) => {
   useEffect(() => {
     if (!currentUser?._id) return;
 
-    const newSocket = io(import.meta.env.VITE_SOCKET_URL || "http://localhost:5001", {
+    const newSocket = io(import.meta.env.VITE_SOCKET_URL || "http://localhost:1001", {
       transports: ["websocket"],
       reconnection: true,
     });
