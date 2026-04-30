@@ -1,0 +1,466 @@
+/* ─── Design Tokens ─────────────────────────────────────────── */
+:root {
+  --gray-50:  #F9F9F8;
+  --gray-100: #F1EFE8;
+  --gray-200: #D3D1C7;
+  --gray-400: #888780;
+  --gray-600: #122e44;
+  --gray-800: #122e44;
+  --gray-900: #122e44;
+
+  --blue-50:  #E6F1FB;
+  --blue-200: #85B7EB;
+  --blue-600: #185FA5;
+  --blue-800: #0C447C;
+
+  --teal-50:  #E1F5EE;
+  --teal-600: #0F6E56;
+  --teal-800: #085041;
+
+  --amber-50:  #FAEEDA;
+  --amber-600: #122e44;
+  --amber-800: #122e44;
+
+  --red-50:   #FCEBEB;
+  --red-600:  #A32D2D;
+
+  --green-50:  #EAF3DE;
+  --green-600: #3B6D11;
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+}
+
+/* ─── Page Layout ────────────────────────────────────────────── */
+.wrm-page {
+  padding: 18px;
+  min-height: 100vh;
+}
+
+/* ─── Page Header ────────────────────────────────────────────── */
+.wrm-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.wrm-page-title {
+  margin: 0 !important;
+  color: var(--gray-900) !important;
+  font-weight: 500 !important;
+}
+
+.wrm-page-subtitle {
+  color: var(--gray-400);
+  font-size: 13px;
+}
+
+/* ─── Section Label ──────────────────────────────────────────── */
+.wrm-section-label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gray-400);
+  margin-bottom: 12px;
+  margin-top: 0;
+}
+
+/* ─── Cards ──────────────────────────────────────────────────── */
+.wrm-card {
+  background: #fff;
+  border: 0.5px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+}
+
+.wrm-card--muted {
+  background: var(--gray-50);
+  border: 0.5px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+}
+
+.wrm-card--blue {
+  background: var(--blue-50);
+  border: 0.5px solid var(--blue-200);
+  border-radius: var(--radius-lg);
+  padding: 14px 18px;
+  margin-bottom: 20px;
+}
+
+/* ─── Metric Cards ───────────────────────────────────────────── */
+.wrm-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.wrm-metric {
+  background: #fff;
+  border: 0.5px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+}
+
+.wrm-metric__label {
+  font-size: 11px;
+  color: var(--gray-400);
+  display: block;
+  margin-bottom: 6px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Make first two metric labels blue */
+.wrm-metric:first-child .wrm-metric__label,
+.wrm-metric:nth-child(2) .wrm-metric__label {
+  color: var(--blue-600);
+}
+
+.wrm-metric__value {
+  font-size: 26px;
+  font-weight: 500;
+  color: var(--gray-900);
+  line-height: 1.1;
+}
+.wrm-metric__value1 {
+  font-size: 80px;
+  font-weight: 500;
+  color: var(--gray-900);
+  line-height: 1.1;
+}
+
+.wrm-metric__sub {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+/* Simple distinct colors as requested */
+.wrm-metric__sub {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.wrm-metric__done {
+  font-size: 22px;
+  font-weight: 700;
+  padding: 12px;
+    background: rgba(11, 245, 42, 0.452);
+border-radius: 19px;
+  color: var(--teal-600);
+ 
+}
+
+.wrm-metric__pending {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--amber-600);
+  background: rgba(245, 11, 11, 0.452);
+  padding: 20px;
+  border-radius: 19px;
+}
+
+/* Hover effect for better interactivity */
+.wrm-metric:hover .wrm-metric__done {
+  transform: scale(1.02);
+  transition: transform 0.2s ease;
+}
+
+
+/* ─── Filters Bar ────────────────────────────────────────────── */
+.wrm-filters {
+  background: #fff;
+  border: 0.5px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: 14px 18px;
+  margin-bottom: 20px;
+}
+
+/* ─── Table Container ────────────────────────────────────────── */
+.wrm-table-wrap {
+  background: #fff;
+  border: 0.5px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+/* ─── Table Row Hover ────────────────────────────────────────── */
+.wrm-table .ant-table-tbody > tr:hover > td {
+  background: var(--gray-50) !important;
+}
+
+.wrm-table .ant-table-cell {
+  vertical-align: middle !important;
+}
+
+/* ─── Table Summary Row ──────────────────────────────────────── */
+.wrm-summary-row {
+  background: var(--gray-50);
+  font-weight: 500;
+}
+
+/* ─── Progress Cell ──────────────────────────────────────────── */
+.wrm-progress-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.wrm-progress-cell__fraction {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gray-900);
+}
+
+.wrm-progress-cell__fraction span {
+  color: var(--gray-400);
+  font-weight: 400;
+}
+
+.wrm-progress-cell__note {
+  font-size: 11px;
+}
+
+.wrm-progress-cell__note--pending {
+  color: var(--amber-600);
+}
+
+.wrm-progress-cell__note--done {
+  color: var(--teal-600);
+}
+
+/* ─── Status Pills ───────────────────────────────────────────── */
+.wrm-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.wrm-pill--blue {
+  background: var(--blue-50);
+  color: var(--blue-600);
+}
+
+.wrm-pill--teal {
+  background: var(--teal-50);
+  color: var(--teal-600);
+}
+
+.wrm-pill--amber {
+  background: var(--amber-50);
+  color: var(--amber-600);
+}
+
+.wrm-pill--red {
+  background: var(--red-50);
+  color: var(--red-600);
+}
+
+/* ─── Drawer Sections ────────────────────────────────────────── */
+.wrm-drawer-section {
+  background: var(--gray-50);
+  border: 0.5px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  margin-bottom: 20px;
+}
+
+.wrm-drawer-actions {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+}
+
+/* ─── Week Tab ───────────────────────────────────────────────── */
+.wrm-week-progress-strip {
+  background: var(--gray-50);
+  border: 0.5px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  margin-bottom: 16px;
+}
+
+.wrm-week-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.wrm-week-progress-label {
+  font-size: 12px;
+  color: var(--gray-600);
+}
+
+.wrm-week-progress-pct {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.wrm-week-progress-pct--done {
+  color: var(--teal-600);
+}
+
+.wrm-week-progress-pct--active {
+  color: var(--gray-800);
+}
+
+/* ─── Week Stat Tile ─────────────────────────────────────────── */
+.wrm-week-stat {
+  background: var(--gray-50);
+  border: 0.5px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+}
+
+.wrm-week-stat__label {
+  font-size: 11px;
+  color: var(--gray-400);
+  display: block;
+  margin-bottom: 4px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.wrm-week-stat__value {
+  font-size: 22px;
+  font-weight: 500;
+}
+
+.wrm-week-stat__value--done {
+  color: var(--teal-600);
+}
+
+.wrm-week-stat__value--active {
+  color: var(--gray-900);
+}
+
+.wrm-week-stat__suffix {
+  font-size: 13px;
+  color: var(--gray-400);
+  font-weight: 400;
+}
+
+.wrm-week-stat__remaining {
+  display: block;
+  font-size: 11px;
+  margin-top: 4px;
+  color: var(--amber-600);
+}
+
+/* ─── Posts Section Header ───────────────────────────────────── */
+.wrm-posts-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+/* ─── Empty Posts State ──────────────────────────────────────── */
+.wrm-posts-empty {
+  text-align: center;
+  padding: 24px 0;
+  color: var(--gray-400);
+  font-size: 13px;
+  background: var(--gray-50);
+  border-radius: var(--radius-md);
+  border: 0.5px dashed var(--gray-200);
+}
+
+/* ─── Blue Summary Strip (inside drawer) ────────────────────── */
+.wrm-monthly-strip {
+  background: var(--blue-50);
+  border: 0.5px solid var(--blue-200);
+  border-radius: var(--radius-lg);
+  padding: 14px 18px;
+  margin-bottom: 20px;
+}
+
+.wrm-monthly-strip__label {
+  font-size: 11px;
+  color: var(--blue-800);
+  display: block;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.wrm-monthly-strip__value {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--blue-800);
+}
+
+.wrm-monthly-strip__suffix {
+  color: var(--blue-200);
+  font-weight: 400;
+}
+
+.wrm-monthly-strip__pending {
+  font-size: 11px;
+  color: var(--blue-600);
+  display: block;
+}
+
+/* ─── View Drawer Week Block ─────────────────────────────────── */
+.wrm-view-week {
+  background: #fff;
+  border: 0.5px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  margin-bottom: 12px;
+}
+
+.wrm-view-week__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.wrm-view-week__title {
+  font-weight: 500;
+  font-size: 13px;
+}
+
+.wrm-view-week__date {
+  font-size: 12px;
+  color: var(--gray-400);
+  display: block;
+  margin-bottom: 10px;
+}
+
+.wrm-view-week__empty {
+  font-size: 12px;
+  color: var(--gray-400);
+}
+
+/* ─── Primary Button Override ────────────────────────────────── */
+.wrm-btn-primary.ant-btn-primary {
+  background: var(--blue-600) !important;
+  border-color: var(--blue-600) !important;
+}
+
+.wrm-btn-primary.ant-btn-primary:hover {
+  background: var(--blue-800) !important;
+  border-color: var(--blue-800) !important;
+}
+
+/* ─── Ant Design Overrides ───────────────────────────────────── */
+.wrm-table .ant-table-summary td {
+  background: var(--gray-50) !important;
+}

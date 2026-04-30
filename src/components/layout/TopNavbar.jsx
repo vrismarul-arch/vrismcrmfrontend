@@ -5,11 +5,11 @@ import {
   Dropdown,
   Badge,
   Tooltip,
-  Divider,
   List,
   Tag,
   Popover,
   Empty,
+  Drawer,
 } from "antd";
 import {
   AudioMutedOutlined,
@@ -18,6 +18,7 @@ import {
   UserOutlined,
   WarningFilled,
   WhatsAppOutlined,
+  MenuOutlined,
 } from "@ant-design/icons";
 import logo from "../../assets/vrism.png";
 import { useNavigate } from "react-router-dom";
@@ -31,18 +32,19 @@ import {
 } from "../../utils/notificationSound";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import Sidebar from "./Sidebar";
 import "./TopNavbar.css";
 
 dayjs.extend(relativeTime);
 
-const TopNavbar = ({ collapsed, setCollapsed }) => {
+const TopNavbar = ({ collapsed, setCollapsed, isMobile }) => {
   const navigate = useNavigate();
   const lsUser = JSON.parse(localStorage.getItem("user"));
   const { presenceMap, socket } = useContext(PresenceContext);
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
 
   if (!lsUser) return null;
 
-  /* ================= PRESENCE ================= */
   const presenceColors = {
     online: "#00d12e",
     busy: "#ff2d2d",
@@ -65,7 +67,6 @@ const TopNavbar = ({ collapsed, setCollapsed }) => {
     boxShadow: `0 0 6px ${presenceColors[livePresence]}`,
   };
 
-  /* ================= OLD NOTIFICATIONS ================= */
   const [notificationCount, setNotificationCount] = useState(0);
   const [prevNotificationCount, setPrevNotificationCount] = useState(0);
 
@@ -90,7 +91,6 @@ const TopNavbar = ({ collapsed, setCollapsed }) => {
     return () => clearInterval(intv);
   }, [prevNotificationCount]);
 
-  /* ================= ALERT SYSTEM ================= */
   const [alerts, setAlerts] = useState([]);
   const [alertOpen, setAlertOpen] = useState(false);
 
@@ -121,7 +121,6 @@ const TopNavbar = ({ collapsed, setCollapsed }) => {
 
   const unreadCount = alerts.filter((a) => !a.isRead).length;
 
-  /* ================= ALERT CLICK ================= */
   const handleAlertClick = async (alert) => {
     await axios.put(`/api/alerts/${alert._id}/read`);
 
@@ -157,7 +156,6 @@ const TopNavbar = ({ collapsed, setCollapsed }) => {
     loadAlerts();
   };
 
-  /* ================= PRESENCE UPDATE ================= */
   const updatePresence = async (status) => {
     await axios.post("/api/users/status/update", {
       userId: lsUser._id,
@@ -169,16 +167,15 @@ const TopNavbar = ({ collapsed, setCollapsed }) => {
     });
   };
 
-  /* ================= ALERT PANEL ================= */
   const AlertPanel = (
     <div style={{ width: 360, maxHeight: 380, overflowY: "auto" }}>
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", padding: "0 0 12px 0" }}>
         <b>Unread ({unreadCount})</b>
         <div style={{ display: "flex", gap: 12 }}>
-          <span onClick={clearUnread} style={{ color: "#fa8c16", cursor: "pointer" }}>
+          <span onClick={clearUnread} style={{ color: "#fa8c16", cursor: "pointer", fontSize: 12 }}>
             Clear Unread
           </span>
-          <span onClick={clearAll} style={{ color: "red", cursor: "pointer" }}>
+          <span onClick={clearAll} style={{ color: "red", cursor: "pointer", fontSize: 12 }}>
             Clear All
           </span>
         </div>
@@ -201,15 +198,14 @@ const TopNavbar = ({ collapsed, setCollapsed }) => {
           >
             <b>{item.type} Alert</b>
             <Tag style={{ marginLeft: 8 }}>{item.type}</Tag>
-            <div>{item.message}</div>
-            <small>{dayjs(item.createdAt).fromNow()}</small>
+            <div style={{ fontSize: 13, marginTop: 4 }}>{item.message}</div>
+            <small style={{ color: "#999" }}>{dayjs(item.createdAt).fromNow()}</small>
           </div>
         )}
       />
     </div>
   );
 
-  /* ================= DROPDOWN ================= */
   const dropdownMenu = {
     items: [
       {
@@ -229,7 +225,7 @@ const TopNavbar = ({ collapsed, setCollapsed }) => {
                   marginRight: 8,
                 }}
               />
-              {status.replace("_", " ")}
+              {status.replace("_", " ").toUpperCase()}
             </div>
           ),
         })),
@@ -256,79 +252,118 @@ const TopNavbar = ({ collapsed, setCollapsed }) => {
 
   const showWhatsApp = lsUser.role !== "Client";
 
+  const handleMobileDrawerClose = () => {
+    setMobileDrawerOpen(false);
+  };
+
   return (
-    <div className="top-navbar-container">
-      <div
-        className="navbar-left-content"
-        onClick={() => setCollapsed(!collapsed)}
-      />
+    <>
+      <div className="top-navbar-container">
+        {/* Left section with hamburger menu and logo */}
+        <div className="top-navbar-left">
+          {/* Hamburger Menu Button - Only on Mobile */}
+          {isMobile && (
+            <button 
+              className="hamburger-menu-btn"
+              onClick={() => setMobileDrawerOpen(true)}
+              aria-label="Open menu"
+            >
+              <MenuOutlined className="hamburger-icon" />
+            </button>
+          )}
 
-      {/* MOBILE LOGO ONLY */}
-      <div className="mobile-logo-only">
-        <img src={logo} alt="Logo" className="mobile-logo-img" />
-      </div>
+          {/* Desktop collapse toggle button */}
+          {!isMobile && (
+            <button
+              className="desktop-collapse-btn"
+              onClick={() => setCollapsed(!collapsed)}
+              aria-label="Toggle sidebar"
+            >
+              <MenuOutlined className="collapse-icon" />
+            </button>
+          )}
 
-      <div className="top-navbar-right">
-        {/* MUTE */}
-        <Tooltip title={isMuted() ? "Enable Sound" : "Mute"}>
-         <span
-  className="mute-toggle"
-  onClick={() =>
-    toast(toggleMute() ? "Muted" : "Sound Enabled")
-  }
->
-  {isMuted() ? (
-    <AudioMutedOutlined style={{ fontSize: 19 }} />
-  ) : (
-    <AudioOutlined style={{ fontSize: 19 }} />
-  )}
-</span>
+          {/* Logo - visible on mobile */}
+        
+        </div>
 
-        </Tooltip>
+        {/* Right section with icons and user menu */}
+        <div className="top-navbar-right">
+          <Tooltip title={isMuted() ? "Enable Sound" : "Mute"}>
+            <span
+              className="mute-toggle"
+              onClick={() => toast(toggleMute() ? "Muted" : "Sound Enabled")}
+            >
+              {isMuted() ? (
+                <AudioMutedOutlined style={{ fontSize: 19 }} />
+              ) : (
+                <AudioOutlined style={{ fontSize: 19 }} />
+              )}
+            </span>
+          </Tooltip>
 
-        {/* WHATSAPP – NOT FOR CLIENT */}
-        {showWhatsApp && (
-          <Tooltip title="Notifications">
-            <Badge count={notificationCount}>
-              <WhatsAppOutlined
+          {showWhatsApp && (
+            <Tooltip title="Notifications">
+              <Badge count={notificationCount}>
+                <WhatsAppOutlined
+                  className="bell-icon"
+                  style={{ fontSize: 24, marginLeft: 15 }}
+                  onClick={() => navigate("/notifications")}
+                />
+              </Badge>
+            </Tooltip>
+          )}
+
+          <Popover
+            content={AlertPanel}
+            trigger="click"
+            placement="bottomRight"
+            open={alertOpen}
+            onOpenChange={setAlertOpen}
+          >
+            <Badge count={unreadCount}>
+              <WarningFilled
                 className="bell-icon"
                 style={{ fontSize: 24, marginLeft: 15 }}
-                onClick={() => navigate("/notifications")}
               />
             </Badge>
-          </Tooltip>
-        )}
+          </Popover>
 
-        {/* ALERT BELL */}
-        <Popover
-          content={AlertPanel}
-          trigger="click"
-          placement="bottomRight"
-          open={alertOpen}
-          onOpenChange={setAlertOpen}
-        >
-          <Badge count={unreadCount}>
-            <WarningFilled
-              className="bell-icon"
-              style={{ fontSize: 24, marginLeft: 15 }}
-            />
-          </Badge>
-        </Popover>
-
-     <Dropdown menu={dropdownMenu} trigger={["click"]}>
-          <div style={{ cursor: "pointer", position: "relative" }}>
-            <Avatar 
-              style={{ fontSize: 24, backgroundColor: "#122e44" }}
-              src={lsUser?.profileImage} // <-- CHANGE: Use profile image URL
-            >
-              {/* CHANGE: Fallback to first letter only if profileImage is missing */}
-              {!lsUser?.profileImage && lsUser?.name?.charAt(0)}
-            </Avatar>
-            <span style={presenceDot}></span>
-          </div>
-        </Dropdown>
+          <Dropdown menu={dropdownMenu} trigger={["click"]}>
+            <div className="user-avatar-container" style={{ cursor: "pointer", position: "relative" }}>
+              <Avatar 
+                className="user-avatar"
+                style={{ fontSize: 24, backgroundColor: "#122e44" }}
+                src={lsUser?.profileImage}
+              >
+                {!lsUser?.profileImage && lsUser?.name?.charAt(0)}
+              </Avatar>
+              <span style={presenceDot}></span>
+            </div>
+          </Dropdown>
+        </div>
       </div>
-    </div>
+
+  <Drawer
+  placement="left"
+  closable={false}
+  onClose={handleMobileDrawerClose}
+  open={mobileDrawerOpen}
+  width={260}
+  header={null}
+  styles={{
+    body: {
+      padding: 0,
+      background: "#fafafa",
+    },
+  }}
+>
+  <Sidebar 
+    collapsed={false} 
+    onMobileClose={handleMobileDrawerClose}
+  />
+</Drawer>
+    </>
   );
 };
 

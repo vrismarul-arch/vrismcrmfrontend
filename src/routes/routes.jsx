@@ -18,7 +18,10 @@ import SubscriptionManagement from "../pages/clients/SubscriptionManagement";
 
 // ⭐ ReactFlow Provider Fix
 import { ReactFlowProvider } from "reactflow";
-import MonthlyContentDashboard from "../pages/content/MonthlyContentDashboard";
+// import MonthlyContentDashboard from "../pages/content/MonthlyContentDashboard";
+import PublicHolidayManager from "../pages/holiday/Publicholidaymanager";
+import WeeklyReport from "../pages/content/WeeklyReport";
+import ClientReportPage from "../pages/content/ClientReportPage";
 
 // Lazy Pages
 const Dashboard = React.lazy(() => import("../pages/dashboard/Dashboard"));
@@ -101,7 +104,8 @@ export const appRoutes = [
 
   // Task Routes
   { path: "/taskboard", element: <RoleGuard allowedRoles={['Admin','Superadmin','Client','Employee','Team Leader']}><TaskBoard/></RoleGuard> },
-  { path: "/content", element: <RoleGuard allowedRoles={['Admin','Superadmin','Client','Employee','Team Leader']}><MonthlyContentDashboard/></RoleGuard> },
+  { path: "/content", element: <RoleGuard allowedRoles={['Admin','Superadmin','Client','Team Leader']}><WeeklyReport/></RoleGuard> },
+  { path: "/mycontent", element: <RoleGuard allowedRoles={['Admin','Superadmin','Client','Team Leader']}><ClientReportPage/></RoleGuard> },
   { path: "/taskmanage", element: <RoleGuard allowedRoles={['Admin','Superadmin','Client','Employee','Team Leader']}><TaskBoard/></RoleGuard> },
 
   { path: "/chat", element: <RoleGuard allowedRoles={['Admin','Superadmin','Client','Employee','Team Leader']}><Chat/></RoleGuard> },
@@ -143,6 +147,7 @@ export const appRoutes = [
   { path: "/management", element: <RoleGuard allowedRoles={['Superadmin','Client','Admin']}><CombinedManagement/></RoleGuard> },
 
   { path: "/dailyplan", element: <RoleGuard allowedRoles={['Superadmin','Client','Admin','Team Leader','Employee']}><Scheduler/></RoleGuard> },
+  { path: "/holidays", element: <RoleGuard allowedRoles={['Superadmin','Client','Admin','Team Leader','Employee']}><PublicHolidayManager/></RoleGuard> },
 
   // { path: "/client-dashboard", element: <RoleGuard allowedRoles={['Superadmin','Client','Admin','Team Leader','Employee']}><ClientDashboard/></RoleGuard> },
 

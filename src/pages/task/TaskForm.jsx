@@ -688,7 +688,7 @@ const TaskForm = ({ visible, onClose, editing, onSaved }) => {
           </Card>
 
           {/* ================= MONTHLY CONTENT CLIENT ================= */}
-          <Card 
+          {/* <Card 
             className="zoho-section-card"
             title={
               <Space>
@@ -782,7 +782,6 @@ const TaskForm = ({ visible, onClose, editing, onSaved }) => {
               </Select>
             </Form.Item>
 
-            {/* Client Progress Details with Edit Button */}
             {selectedClientDetails && (
               <div style={{ 
                 marginTop: 16, 
@@ -903,7 +902,7 @@ const TaskForm = ({ visible, onClose, editing, onSaved }) => {
                 style={{ marginTop: 16 }}
               />
             )}
-          </Card>
+          </Card> */}
 
           {/* ================= ACCOUNT & SERVICE ================= */}
           <Card 

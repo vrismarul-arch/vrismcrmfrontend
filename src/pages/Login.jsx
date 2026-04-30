@@ -17,48 +17,50 @@ const Login = () => {
     window.onpopstate = () => navigate("/login", { replace: true });
   }, []);
 
-  const onFinish = async (values) => {
-    try {
-      setLoading(true);
+const onFinish = async (values) => {
+  try {
+    setLoading(true);
 
-      const res = await axios.post("/api/auth/login", {
-        username: values.email,
-        password: values.password,
-      });
+    const res = await axios.post("/api/auth/login", {
+      email: values.email, // ✅ FIXED
+      password: values.password,
+    });
 
-      const { user, token } = res.data;
+    const { user, token } = res.data;
 
-      localStorage.setItem("user", JSON.stringify(user));
-      localStorage.setItem("token", token);
-      localStorage.setItem("token_expiry", Date.now() + 2 * 24 * 60 * 60 * 1000);
+    localStorage.setItem("user", JSON.stringify(user));
+    localStorage.setItem("token", token);
+    localStorage.setItem("token_expiry", Date.now() + 2 * 24 * 60 * 60 * 1000);
 
-      await axios.post("/api/users/status/update", {
-        userId: user._id,
-        presence: "online",
-      });
+    await axios.post("/api/users/status/update", {
+      userId: user._id,
+      presence: "online",
+    });
 
-      socket.emit("presence_change", {
-        userId: user._id,
-        presence: "online",
-      });
+    socket.emit("presence_change", {
+      userId: user._id,
+      presence: "online",
+    });
 
-      toast.success(`Welcome ${user.name}!`);
+    toast.success(`Welcome ${user.name}!`);
 
-      if (user.role === "SuperAdmin" || user.role === "Admin") {
-        navigate("/taskmanage");
-      } else if (user.role === "Team Leader" || user.role === "Employee") {
-        navigate("/attendance");
-      } else if (user.role === "Client") {
-        navigate("/client-dashboard");
-      } else {
-        navigate("/eodreport");
-      }
-    } catch (err) {
-      toast.error("Invalid credentials");
-    } finally {
-      setLoading(false);
+    if (user.role === "SuperAdmin" || user.role === "Admin") {
+      navigate("/taskmanage");
+    } else if (user.role === "Team Leader" || user.role === "Employee") {
+      navigate("/attendance");
+    } else if (user.role === "Client") {
+      navigate("/mycontent");
+    } else {
+      navigate("/eodreport");
     }
-  };
+
+  } catch (err) {
+    console.error(err.response?.data || err.message); // 🔍 debug
+    toast.error(err.response?.data?.message || "Invalid credentials");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="login-wrapper">

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+// src/components/Sidebar/Sidebar.jsx
+import React, { useState, useEffect, useMemo } from "react";
 import { Menu } from "antd";
 import {
   DashboardOutlined,
@@ -13,95 +14,101 @@ import {
   MessageOutlined,
   SecurityScanOutlined,
   WalletOutlined,
-  DockerOutlined,
   ScheduleOutlined,
-  ProjectOutlined, // Imported for Projects
-  BarChartOutlined, // Imported for Leads Dashboard/Tracking
-  CalendarOutlined, // Imported for Daily Planner/Attendance
-  IdcardOutlined, // Imported for Profile
+  ProjectOutlined,
+  BarChartOutlined,
+  CalendarOutlined,
+  IdcardOutlined,
   FolderOpenOutlined,
   NodeIndexOutlined,
   StepForwardFilled,
-  ProjectFilled, // Imported for Leads/Clients/Quotations
+  ProjectFilled,
+  CalendarTwoTone,
+  InstagramOutlined,
 } from "@ant-design/icons";
 import { useNavigate, useLocation } from "react-router-dom";
-import "./sidebar.css";
+import "./Sidebar.css";
 
 import logoCollapsed from "../../assets/vrismsmall.png";
 import logoExpanded from "../../assets/vrism.png";
 
-const Sidebar = ({ collapsed }) => {
+const Sidebar = ({ collapsed, onMobileClose }) => {
   const navigate = useNavigate();
   const location = useLocation();
-
-  // Get the first part of the path (e.g., '/dashboard' from '/dashboard/deals')
-  const selectedKey = "/" + location.pathname.split("/")[1];
 
   const user = JSON.parse(localStorage.getItem("user"));
   const role = user?.role;
 
-  const rawMenuItems = [
+  // Define menu items with unique keys
+  const rawMenuItems = useMemo(() => [
     {
       key: "/dashboard",
       icon: <DashboardOutlined />,
       label: "Dashboard",
-      roles: ["Admin", "Superadmin", "Employee", "Team Leader","Client"],
+      roles: ["Admin", "Superadmin", "Employee", "Team Leader", "Client"],
       children: [
         {
           key: "/eodreport",
           label: "EOD Report",
           roles: ["Admin", "Superadmin"],
-          icon: <FileTextOutlined />, // Added Icon
+          icon: <FileTextOutlined />,
         },
         {
           key: "/dashboard/deals",
           label: "Leads Dashboard",
           roles: ["Admin", "Superadmin", "Team Leader"],
-          icon: <BarChartOutlined />, // Added Icon
+          icon: <BarChartOutlined />,
         },
         {
           key: "/taskmanage",
           label: "Task Dashboard",
           roles: ["Admin", "Superadmin", "Team Leader", "Employee"],
-          icon: <ScheduleOutlined />, // Added Icon
-        }
-        ,        { key: "/content", label: "Content Dashboard", roles: ["Admin", "Superadmin", "Team Leader", "Employee","Client"], icon: <ScheduleOutlined /> },
-
+          icon: <ScheduleOutlined />,
+        },
+        { 
+          key: "/content", 
+          label: "Content Dashboard", 
+          roles: ["Admin", "Superadmin", "Team Leader", "Employee"], 
+          icon: <InstagramOutlined /> 
+        },
       ],
     },
     {
       key: "/Report",
       icon: <FolderOpenOutlined />,
-      label: "Mange Reports",
+      label: "Manage Reports",
       roles: ["Admin", "Superadmin", "Employee", "Team Leader"],
       children: [
-        
         {
           key: "/manage-leaves",
-          label: "ManageLeaves",
+          label: "Manage Leaves",
           roles: ["Admin", "Superadmin", "Team Leader"],
-          icon: <UserSwitchOutlined />, // Added Icon
+          icon: <UserSwitchOutlined />,
         },
-        
+        {
+          key: "/holidays",
+          label: "Manage Holidays",
+          roles: ["Admin", "Superadmin", "Team Leader"],
+          icon: <CalendarTwoTone />,
+        },
         {
           key: "/dailyplan",
           label: "Daily Planner",
           roles: ["Admin", "Superadmin", "Team Leader", "Employee"],
-          icon: <CalendarOutlined />, // Added Icon
+          icon: <CalendarOutlined />,
         },
         {
           key: "/attendance",
           label: "TimeSheet",
           roles: ["Admin", "Superadmin", "Team Leader", "Employee"],
-          icon: <LockOutlined />, // Added Icon
+          icon: <LockOutlined />,
         },
         {
           key: "/workingdays",
-          label: "Attendance", // Corrected typo from Attance
+          label: "Attendance",
           roles: ["Admin", "Superadmin", "Team Leader"],
-          icon: <SecurityScanOutlined />, // Added Icon
+          icon: <SecurityScanOutlined />,
         },
-        
       ],
     },
     {
@@ -110,23 +117,23 @@ const Sidebar = ({ collapsed }) => {
       label: "Project Management",
       roles: ["Admin", "Superadmin", "Team Leader", "Employee"],
       children: [
-         {
-          key: "/process-step",
+        {
+          key: "/process-step-pm",
           icon: <StepForwardFilled />,
           label: "Process Step",
           roles: ["Admin", "Superadmin", "Team Leader"],
         },
-       {
+        {
           key: "/projects",
           label: "Projects",
           roles: ["Admin", "Superadmin", "Team Leader", "Employee"],
-          icon: <ProjectOutlined />, // Added Icon
+          icon: <ProjectOutlined />,
         },
         {
           key: "/project-track",
           label: "Tracking",
           roles: ["Admin", "Superadmin", "Team Leader"],
-          icon: <AppstoreOutlined />, // Added Icon
+          icon: <AppstoreOutlined />,
         }
       ],
     },
@@ -149,7 +156,7 @@ const Sidebar = ({ collapsed }) => {
           roles: ["Admin", "Superadmin", "Team Leader"],
         },
         {
-          key: "/process-step",
+          key: "/process-step-app",
           icon: <StepForwardFilled />,
           label: "Process Step",
           roles: ["Admin", "Superadmin", "Team Leader"],
@@ -195,7 +202,7 @@ const Sidebar = ({ collapsed }) => {
         {
           key: "/apply-leave",
           icon: <ScheduleOutlined />,
-          label: "leave",
+          label: "Leave",
           roles: ["Admin", "Superadmin", "Team Leader", "Employee"],
         },
       ],
@@ -208,141 +215,192 @@ const Sidebar = ({ collapsed }) => {
       children: [
         {
           key: "/management",
-          icon: <UsergroupAddOutlined />, // Added Icon
+          icon: <UsergroupAddOutlined />,
           label: "User Management",
           roles: ["Superadmin"],
         },
         {
           key: "/profile",
-          icon: <IdcardOutlined />, // Added Icon
+          icon: <IdcardOutlined />,
           label: "Profile",
           roles: ["Superadmin", "Admin", "Employee", "Team Leader"],
         },
       ],
     },
     {
-      key: "/clinet",
+      key: "/client",
       icon: <NodeIndexOutlined />,
       label: "Client",
       roles: ["Superadmin", "Client"],
       children: [
         {
+          key: "/mycontent",
+          icon: <InstagramOutlined />,
+          label: "My Reports",
+          roles: ["Client"],
+        },
+        {
           key: "/client-dashboard",
-          icon: <UsergroupAddOutlined />, // Added Icon
+          icon: <UsergroupAddOutlined />,
           label: "Projects Status",
           roles: ["Client"],
         },
         {
           key: "/subscriptions",
-          icon: <UsergroupAddOutlined />, // Added Icon
+          icon: <UsergroupAddOutlined />,
           label: "Subscriptions",
           roles: ["Client"],
         },
-
         {
           key: "/createsubscriptions",
           icon: <IdcardOutlined />,
-          label: "Create subscriptions ",
+          label: "Create Subscriptions",
           roles: ["Superadmin", "Admin", "Employee", "Team Leader"],
         }
       ],
     },
-  ];
+  ], []);
 
-  // Function to filter menu items based on the user's role
-  const filterByRole = (items) =>
-    items
-      .map((item) => {
-        if (item.children) {
-          const filteredChildren = filterByRole(item.children);
-          // Only include the parent if it has children for the current role OR the parent itself is allowed
-          if (filteredChildren.length > 0 && (!item.roles || item.roles.includes(role))) {
-            return { ...item, children: filteredChildren };
+  // Filter menu items by role with memoization
+  const filterByRole = useMemo(() => {
+    const filterItems = (items) =>
+      items
+        .map((item) => {
+          // Check role access for parent
+          const hasParentAccess = !item.roles || item.roles.includes(role);
+          
+          if (item.children) {
+            const filteredChildren = filterItems(item.children);
+            // Show parent if: has access AND has children
+            if (hasParentAccess && filteredChildren.length > 0) {
+              return { ...item, children: filteredChildren };
+            }
+            return null;
+          } else {
+            // Leaf node - show if role matches
+            return (!item.roles || item.roles.includes(role)) ? item : null;
           }
-          return null;
-        } else {
-          // Leaf item: check if the role is allowed
-          return !item.roles || item.roles.includes(role) ? item : null;
-        }
-      })
-      .filter(Boolean); // Remove null items
+        })
+        .filter(Boolean);
 
-  const menuItems = filterByRole(rawMenuItems);
+    return filterItems(rawMenuItems);
+  }, [rawMenuItems, role]);
 
-  const rootSubmenuKeys = menuItems.map((item) => item.key);
+  // Get all root keys for open/close logic
+  const rootSubmenuKeys = useMemo(() => 
+    filterByRole.map((item) => item.key), 
+    [filterByRole]
+  );
+
+  // Find parent key for current path
+  const getParentKey = (pathname) => {
+    const parent = filterByRole.find(item => 
+      pathname === item.key || 
+      (item.children && item.children.some(child => pathname.startsWith(child.key)))
+    );
+    return parent ? parent.key : null;
+  };
+
   const [openKeys, setOpenKeys] = useState([]);
 
+  // Handle open/close of submenus
   useEffect(() => {
     if (!collapsed) {
-      // Find the parent key of the currently selected route
-      const currentParent = rootSubmenuKeys.find((key) => location.pathname.startsWith(key));
-      setOpenKeys(currentParent ? [currentParent] : []); // active route auto open
+      const currentParent = getParentKey(location.pathname);
+      if (currentParent && !openKeys.includes(currentParent)) {
+        setOpenKeys([currentParent]);
+      }
     } else {
-      setOpenKeys([]); // collapse closes all
+      setOpenKeys([]);
     }
-  }, [collapsed, selectedKey, location.pathname]); // Added location.pathname to dependencies
+  }, [collapsed, location.pathname, filterByRole]);
 
-  // Logic to only keep one submenu open at a time (Accordion effect)
+  // Handle submenu open/close
   const onOpenChange = (keys) => {
-    const latestOpenKey = keys.find((key) => !openKeys.includes(key));
-    if (rootSubmenuKeys.includes(latestOpenKey)) {
-      setOpenKeys(latestOpenKey ? [latestOpenKey] : []);
+    if (collapsed) {
+      // When collapsed, don't allow multiple opens
+      const latestOpenKey = keys.find(key => !openKeys.includes(key));
+      if (latestOpenKey && rootSubmenuKeys.includes(latestOpenKey)) {
+        setOpenKeys([latestOpenKey]);
+      } else if (keys.length === 0) {
+        setOpenKeys([]);
+      }
     } else {
+      // When expanded, allow multiple opens
       setOpenKeys(keys);
     }
   };
 
+  // Handle menu click navigation
   const handleMenuClick = ({ key }) => {
+    // Navigate to the clicked item
     navigate(key);
+    
+    // For mobile: close drawer if onMobileClose provided
+    if (onMobileClose) {
+      onMobileClose();
+    }
+  };
+
+  // Get current selected keys based on pathname
+  const getSelectedKeys = () => {
+    // Check if exact match exists
+    if (filterByRole.some(item => item.key === location.pathname)) {
+      return [location.pathname];
+    }
+    
+    // Check children matches
+    for (const item of filterByRole) {
+      if (item.children) {
+        const childMatch = item.children.find(child => 
+          location.pathname === child.key || 
+          location.pathname.startsWith(child.key + '/')
+        );
+        if (childMatch) {
+          return [childMatch.key];
+        }
+      }
+    }
+    
+    return [];
   };
 
   return (
     <div
+      className={`sidebar-container ${collapsed ? 'collapsed' : ''}`}
       style={{
-        position: "fixed",
-        top: 0,
-        height: "100vh",
-        width: collapsed ? 80 : 200,
+        height: "100%",
+        width: "100%",
         overflowY: "auto",
+        overflowX: "hidden",
         background: "#fafafa",
-        transition: "all .3s",
+        display: "flex",
+        flexDirection: "column",
       }}
     >
-      <div
-        style={{
-          height: 64,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          background: "white",
-          borderBottom: "1px solid #f0f0f0",
-        }}
-      >
+      <div className="sidebar-logo">
         <img
           src={collapsed ? logoCollapsed : logoExpanded}
-          alt="Logo"
-          style={{
-            padding: 10,
-            width: collapsed ? 55 : 160,
-            transition: "all 0.3s",
-          }}
+          alt="VRISM Logo"
+          className="sidebar-logo-img"
         />
       </div>
 
       <Menu
         mode="inline"
         theme="light"
-        items={menuItems}
-        // selectedKeys needs to check the full path to select the correct leaf item
-        selectedKeys={[location.pathname]}
+        items={filterByRole}
+        selectedKeys={getSelectedKeys()}
         openKeys={openKeys}
         onOpenChange={onOpenChange}
         onClick={handleMenuClick}
-        style={{
-          height: "calc(100% - 64px)",
-          borderRight: 0,
-        }}
         inlineCollapsed={collapsed}
+        className="sidebar-menu"
+        style={{
+          flex: 1,
+          borderRight: 0,
+          background: "#fafafa",
+        }}
       />
     </div>
   );

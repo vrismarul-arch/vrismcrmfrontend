@@ -1,74 +1,177 @@
+/* src/components/Sidebar/Sidebar.css */
 
-/* Logo section */
+.sidebar-container {
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.4, 1);
+}
+
+/* Logo Styles */
 .sidebar-logo {
-  height: 64px;
   display: flex;
-  align-items: center;
   justify-content: center;
-  background: white;
+  align-items: center;
+  height: 64px;
+  padding: 16px;
   border-bottom: 1px solid #f0f0f0;
-  transition: all 0.3s ease;
+  background: #fafafa;
 }
 
-.sidebar-logo img {
-  padding: 10px;
+.sidebar-logo-img {
+  width: 100%;
+  max-width: 120px;
   height: auto;
-  transition: all 0.3s ease;
-  width: 170px;
+  object-fit: contain;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.4, 1);
 }
 
-.sidebar.collapsed .sidebar-logo img {
-  width: 59px;
+/* Collapsed Logo */
+.sidebar-container.collapsed .sidebar-logo {
+  height: 64px;
+  padding: 12px;
 }
 
-/* Ant Design Menu overrides */
-.ant-menu {
-  border-right: none !important;
-  color: black;
+.sidebar-container.collapsed .sidebar-logo-img {
+  max-width: 40px;
 }
 
+/* Menu Styles */
+.sidebar-menu {
+  background: #fafafa !important;
+}
+
+/* Menu Item Styles */
 .ant-menu-item {
-  font-size: 14px;
-  height: 44px;
-  color: black !important;
-  line-height: 44px;
+  margin: 4px 8px !important;
+  border-radius: 8px !important;
+  transition: all 0.3s !important;
 }
 
-.ant-menu-submenu-title {
-  font-size: 14px;
-  height: 44px;
-  line-height: 44px;
+.ant-menu-item:hover {
+  background-color: #e6f7ff !important;
 }
 
 .ant-menu-item-selected {
-  background-color: #0E2B43 !important;
+  background-color: #e6f7ff !important;
+  color: #122e44 !important;
   font-weight: 500;
-  color: #f0f0f0 !important;
-  border-left: 4px solid #0E2B43;
 }
 
-.ant-menu-item:hover,
+.ant-menu-item-selected .ant-menu-item-icon {
+  color: #122e44 !important;
+}
+
+/* Submenu Title Styles */
+.ant-menu-submenu-title {
+  margin: 4px 8px !important;
+  border-radius: 8px !important;
+  transition: all 0.3s !important;
+}
+
 .ant-menu-submenu-title:hover {
-  background-color: #f5f5f5 !important;color: black !important;
+  background-color: #f5f5f5 !important;
 }
 
-/* Scrollbar styling for better look */
-.sidebar::-webkit-scrollbar {
-  width: 6px;
+.ant-menu-submenu-open .ant-menu-submenu-title {
+  background-color: #f5f5f5 !important;
 }
 
-.sidebar::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.1);
+/* Submenu Styles */
+.ant-menu-sub {
+  background: #fafafa !important;
+}
+
+.ant-menu-sub .ant-menu-item {
+  padding-left: 48px !important;
+}
+
+/* Collapsed Menu Styles */
+.ant-menu-inline-collapsed {
+  width: 80px;
+}
+
+.ant-menu-inline-collapsed .ant-menu-item {
+  padding: 0 calc(50% - 16px - 1px) !important;
+  text-align: center;
+}
+
+.ant-menu-inline-collapsed .ant-menu-submenu-title {
+  padding: 0 calc(50% - 16px - 1px) !important;
+  text-align: center;
+}
+
+/* Icon Styles */
+.ant-menu-item-icon {
+  font-size: 18px !important;
+}
+
+/* Custom Scrollbar for Sidebar */
+.sidebar-container::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.sidebar-container::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
   border-radius: 4px;
 }
 
-.sidebar::-webkit-scrollbar-track {
-  background-color: transparent;
+.sidebar-container::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
 
-/* Responsive Sidebar Hide for Mobile */
-@media screen and (max-width: 768px) {
-  .sidebar {
-    display: none;
+/* Mobile Drawer Specific Styles */
+.drawer-sidebar .sidebar-container {
+  background: #fafafa;
+}
+
+.drawer-sidebar .sidebar-logo {
+  background: #fafafa;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .sidebar-logo {
+    height: 56px;
+    padding: 12px;
   }
+  
+  .sidebar-logo-img {
+    max-width: 100px;
+  }
+  
+  .ant-menu-item {
+    margin: 2px 8px !important;
+  }
+  
+  .ant-menu-submenu-title {
+    margin: 2px 8px !important;
+  }
+}
+
+/* Animation for menu items */
+.ant-menu-item,
+.ant-menu-submenu-title {
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.4, 1) !important;
+}
+
+/* Active/Hover States */
+.ant-menu-item-active {
+  background-color: #f0f0f0 !important;
+}
+
+.ant-menu-submenu-active .ant-menu-submenu-title {
+  background-color: #f0f0f0 !important;
+}
+
+/* Divider Styles */
+.ant-menu-item-divider {
+  background-color: #f0f0f0 !important;
+}
+
+/* Dark Mode Support (if needed) */
+@media (prefers-color-scheme: dark) {
+  /* Add dark mode styles if required */
 }

@@ -1,3 +1,5 @@
+// components/Profile.js (Updated with DOB field)
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -19,7 +21,8 @@ import {
   Drawer,
   Popconfirm,
   Image,
-  Upload, // New: Imported Upload component
+  Upload,
+  DatePicker,
 } from "antd";
 import {
   LogoutOutlined,
@@ -34,16 +37,17 @@ import {
   ReloadOutlined,
   SaveOutlined,
   DeleteOutlined,
-  UploadOutlined, // New: Imported UploadOutlined
+  UploadOutlined,
+  CalendarOutlined,
+  GiftOutlined,
 } from "@ant-design/icons";
-import axios from "../api/axios"; // Assuming this is your configured Axios instance
-import toast from "react-hot-toast"; // Assuming you use react-hot-toast
-
-// Utility function for file upload
+import axios from "../api/axios";
+import toast from "react-hot-toast";
+import dayjs from "dayjs";
 import { uploadFile } from "../utils/fileStorage";
 
 const { Title, Text } = Typography;
-const { Dragger } = Upload; // For drag and drop image upload
+const { Dragger } = Upload;
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -54,9 +58,9 @@ const Profile = () => {
   const [updating, setUpdating] = useState(false);
   const [form] = Form.useForm();
 
-  // State for profile image management (now integrated into drawer flow)
   const [isImageRemoving, setIsImageRemoving] = useState(false);
-  const [profileImageURL, setProfileImageURL] = useState(null); // Local state for immediate preview
+  const [profileImageURL, setProfileImageURL] = useState(null);
+  const [isBirthday, setIsBirthday] = useState(false);
 
   const getCurrentUserId = () => {
     const storedUser = localStorage.getItem("user");
@@ -71,6 +75,26 @@ const Profile = () => {
       }
     }
     return null;
+  };
+
+  const checkBirthday = (dob) => {
+    if (!dob) return false;
+    const today = new Date();
+    const birthDate = new Date(dob);
+    return today.getDate() === birthDate.getDate() && 
+           today.getMonth() === birthDate.getMonth();
+  };
+
+  const calculateAge = (dob) => {
+    if (!dob) return null;
+    const today = new Date();
+    const birthDate = new Date(dob);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
   };
 
   const fetchUserDetails = async () => {
@@ -89,6 +113,7 @@ const Profile = () => {
       const response = await axios.get(`/api/users/${userId}`);
       setUser(response.data);
       setProfileImageURL(response.data.profileImage);
+      setIsBirthday(checkBirthday(response.data.dob));
       localStorage.setItem("user", JSON.stringify(response.data));
     } catch (error) {
       console.error("Error fetching user details:", error);
@@ -100,6 +125,7 @@ const Profile = () => {
           const parsedUser = JSON.parse(storedUser);
           setUser(parsedUser);
           setProfileImageURL(parsedUser.profileImage);
+          setIsBirthday(checkBirthday(parsedUser.dob));
           toast.error("Failed to fetch latest data. Using cached profile.");
         } catch (e) {
           localStorage.removeItem("user");
@@ -159,15 +185,14 @@ const Profile = () => {
 
   const openEditDrawer = () => {
     if (user) {
-      // Set form fields for basic profile data
       form.setFieldsValue({
         name: user.name,
         email: user.email,
         mobile: user.mobile || "",
         role: user.role,
         status: user.status,
+        dob: user.dob ? dayjs(user.dob) : null,
       });
-      // Set local state for image preview
       setProfileImageURL(user.profileImage);
       setEditDrawerOpen(true);
     } else {
@@ -180,15 +205,15 @@ const Profile = () => {
       setUpdating(true);
       const response = await axios.put(`/api/users/${user._id}`, data);
 
-      // Update local storage and state
       setUser(response.data);
       setProfileImageURL(response.data.profileImage);
+      setIsBirthday(checkBirthday(response.data.dob));
       localStorage.setItem("user", JSON.stringify(response.data));
       
       return response.data;
     } catch (error) {
       console.error("Error updating profile:", error);
-      toast.error("Failed to update profile.");
+      toast.error(error.response?.data?.message || "Failed to update profile.");
       throw error;
     } finally {
       setUpdating(false);
@@ -200,15 +225,16 @@ const Profile = () => {
       const values = await form.validateFields();
       if (!values.password) delete values.password;
       
-      // The image is already updated via handleImageUpload/handleRemoveImage
-      // but we need to ensure the final profileImageURL (which might be null) 
-      // is included in the update if it changed via the separate image functions.
-      // NOTE: For simplicity, the profileImage update is now handled within the image functions,
-      // but we'll include it here just in case, ensuring the latest state is captured.
+      // Format DOB properly
+      if (values.dob) {
+        values.dob = values.dob.toISOString();
+      } else {
+        values.dob = null;
+      }
       
       const updatePayload = {
         ...values,
-        profileImage: profileImageURL, // Use the local state URL
+        profileImage: profileImageURL,
       };
 
       await updateProfileData(updatePayload);
@@ -216,11 +242,10 @@ const Profile = () => {
       toast.success("Profile updated successfully!");
       setEditDrawerOpen(false);
     } catch (error) {
-      // Error already handled by updateProfileData or form validation
+      // Error already handled
     }
   };
 
-  // Custom Upload logic for image field
   const handleImageUpload = async ({ file, onSuccess, onError }) => {
     toast.loading("Uploading image...", { id: "avatar-upload" });
     try {
@@ -231,10 +256,7 @@ const Profile = () => {
         return;
       }
       
-      // Immediately update the database with the new profile image URL
       const updatedUser = await updateProfileData({ profileImage: res.url });
-      
-      // Update local state for immediate drawer preview
       setProfileImageURL(updatedUser.profileImage);
 
       toast.success("Profile photo updated!", { id: "avatar-upload" });
@@ -252,7 +274,7 @@ const Profile = () => {
     toast.loading("Removing image...", { id: "remove-avatar" });
     try {
       await updateProfileData({ profileImage: null });
-      setProfileImageURL(null); // Clear local state
+      setProfileImageURL(null);
       toast.success("Profile photo removed!", { id: "remove-avatar" });
     } catch (err) {
       // Error handled by updateProfileData
@@ -261,13 +283,10 @@ const Profile = () => {
     }
   };
 
-  // --- RENDERING LOGIC ---
-
   if (loading) {
     return (
       <div style={{ display: "flex", justifyContent: "center", minHeight: "60vh", alignItems: "center" }}>
         <Spin size="large" />
-        {error && <Alert message={error} type="error" showIcon />}
       </div>
     );
   }
@@ -281,15 +300,33 @@ const Profile = () => {
     );
   }
 
+  const userAge = calculateAge(user.dob);
+
   return (
-    <div style={{ minHeight: "100vh", padding: "40px 20px" }}>
+    <div style={{ minHeight: "100vh", padding: "40px 20px", background: "#f5f5f5" }}>
       <div style={{ maxWidth: "800px", margin: "0 auto" }}>
         
-        {/* Header Card with Avatar and Actions */}
+        {/* Birthday Banner */}
+        {isBirthday && (
+          <Alert
+            message={
+              <Space>
+                <GiftOutlined style={{ fontSize: 20 }} />
+                <span>🎉 Happy Birthday, {user.name}! 🎂</span>
+              </Space>
+            }
+            description="Wishing you a fantastic day filled with joy and celebration!"
+            type="success"
+            showIcon
+            closable
+            style={{ marginBottom: "24px", borderRadius: "12px" }}
+          />
+        )}
+        
+        {/* Header Card */}
         <Card style={{ marginBottom: "24px", borderRadius: "16px", border: "none", boxShadow: "0 4px 20px rgba(0,0,0,0.05)" }}>
           <Row align="middle" gutter={24}>
             <Col>
-              {/* Profile Image Display (for viewing only) */}
               <div style={{ position: 'relative', width: 80, height: 80 }}>
                 {user.profileImage ? (
                   <Image.PreviewGroup items={[user.profileImage]}>
@@ -301,9 +338,8 @@ const Profile = () => {
                       style={{ 
                         borderRadius: '50%', 
                         objectFit: 'cover', 
-                        border: '2px solid #0E2B43' 
+                        border: isBirthday ? '3px solid #ffd700' : '2px solid #0E2B43' 
                       }}
-                      title="Click image to zoom"
                     />
                   </Image.PreviewGroup>
                 ) : (
@@ -315,12 +351,18 @@ const Profile = () => {
                     {user.name ? user.name.charAt(0).toUpperCase() : null}
                   </Avatar>
                 )}
+                {isBirthday && (
+                  <div style={{ position: 'absolute', bottom: -5, right: -5 }}>
+                    <GiftOutlined style={{ fontSize: 24, color: "#ffd700" }} />
+                  </div>
+                )}
               </div>
             </Col>
 
             <Col flex="auto">
               <Title level={2} style={{ margin: 0, color: "#0E2B43" }}>
                 {user.name}
+                {isBirthday && <Tag color="gold" style={{ marginLeft: 12 }}>🎂 Birthday Today!</Tag>}
               </Title>
               <Text type="secondary" style={{ fontSize: "16px" }}>
                 Welcome back to your profile
@@ -335,7 +377,6 @@ const Profile = () => {
                   size="large"
                   onClick={handleRefresh}
                   style={{ borderRadius: "8px" }}
-                  title="Refresh Profile Data"
                 />
                 <Button
                   type="default"
@@ -346,22 +387,12 @@ const Profile = () => {
                 >
                   Edit Profile
                 </Button>
-                {/* <Button
-                  type="primary"
-                  danger
-                  icon={<LogoutOutlined />}
-                  size="large"
-                  onClick={handleLogout}
-                  style={{ borderRadius: "8px" }}
-                >
-                  Logout
-                </Button> */}
               </Space>
             </Col>
           </Row>
         </Card>
 
-        {/* Profile Details Card 📌 */}
+        {/* Profile Details Card */}
         <Card
           title={
             <Space>
@@ -374,18 +405,11 @@ const Profile = () => {
             border: "none",
             boxShadow: "0 4px 20px rgba(0,0,0,0.05)"
           }}
-          headStyle={{
-            borderBottom: "2px solid #f0f0f0",
-            fontSize: "18px",
-            fontWeight: "600",
-            color: "#0E2B43"
-          }}
         >
-
           <Row gutter={[24, 24]}>
             {/* Full Name */}
             <Col xs={24} sm={12}>
-              <div style={{ marginBottom: "10px" }}>
+              <div>
                 <Text strong style={{ color: "#666", fontSize: "14px", display: "block", marginBottom: "4px" }}>
                   FULL NAME
                 </Text>
@@ -398,7 +422,7 @@ const Profile = () => {
 
             {/* Email Address */}
             <Col xs={24} sm={12}>
-              <div style={{ marginBottom: "10px" }}>
+              <div>
                 <Text strong style={{ color: "#666", fontSize: "14px", display: "block", marginBottom: "4px" }}>
                   EMAIL ADDRESS
                 </Text>
@@ -411,7 +435,7 @@ const Profile = () => {
 
             {/* Mobile Number */}
             <Col xs={24} sm={12}>
-              <div style={{ marginBottom: "10px" }}>
+              <div>
                 <Text strong style={{ color: "#666", fontSize: "14px", display: "block", marginBottom: "4px" }}>
                   MOBILE NUMBER
                 </Text>
@@ -420,13 +444,24 @@ const Profile = () => {
                   <Text style={{ fontSize: "16px" }}>
                     {user.mobile || "Not provided"}
                   </Text>
-                  {user.mobile && (
-                    <Tag
-                      color="success"
-                      size="small"
-                      style={{ marginLeft: "8px", borderRadius: "4px" }}
-                    >
-                      Verified
+                </div>
+              </div>
+            </Col>
+
+            {/* Date of Birth - NEW */}
+            <Col xs={24} sm={12}>
+              <div>
+                <Text strong style={{ color: "#666", fontSize: "14px", display: "block", marginBottom: "4px" }}>
+                  DATE OF BIRTH
+                </Text>
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <CalendarOutlined style={{ marginRight: "8px", color: "#faad14" }} />
+                  <Text style={{ fontSize: "16px" }}>
+                    {user.dob ? dayjs(user.dob).format("DD MMM YYYY") : "Not provided"}
+                  </Text>
+                  {userAge && (
+                    <Tag color="cyan" style={{ marginLeft: 8 }}>
+                      Age: {userAge} years
                     </Tag>
                   )}
                 </div>
@@ -435,7 +470,7 @@ const Profile = () => {
 
             {/* Role */}
             <Col xs={24} sm={12}>
-              <div style={{ marginBottom: "10px" }}>
+              <div>
                 <Text strong style={{ color: "#666", fontSize: "14px", display: "block", marginBottom: "4px" }}>
                   ROLE
                 </Text>
@@ -458,7 +493,7 @@ const Profile = () => {
 
             {/* Status */}
             <Col xs={24} sm={12}>
-              <div style={{ marginBottom: "10px" }}>
+              <div>
                 <Text strong style={{ color: "#666", fontSize: "14px", display: "block", marginBottom: "4px" }}>
                   STATUS
                 </Text>
@@ -490,21 +525,11 @@ const Profile = () => {
                   ? new Date(user.updatedAt).toLocaleString()
                   : new Date().toLocaleDateString()}
               </Text>
-              {error && (
-                <Alert
-                  message="Connection Issue"
-                  description="Some data may be outdated because the latest information could not be loaded from the server."
-                  type="warning"
-                  size="small"
-                  showIcon
-                  style={{ marginTop: "8px" }}
-                />
-              )}
             </Space>
           </div>
         </Card>
 
-        {/* Edit Profile Drawer ✏️ (Image editing is now inside) */}
+        {/* Edit Profile Drawer */}
         <Drawer
           title={
             <Space>
@@ -531,9 +556,8 @@ const Profile = () => {
             </Space>
           }
         >
-
-          <Form form={form} layout="vertical" requiredMark="optional">
-            {/* --------------------- PROFILE IMAGE FIELD --------------------- */}
+          <Form form={form} layout="vertical">
+            {/* Profile Image Field */}
             <Form.Item label="Profile Picture">
               <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
                 {profileImageURL ? (
@@ -576,7 +600,6 @@ const Profile = () => {
                   customRequest={handleImageUpload} 
                   showUploadList={false} 
                   accept="image/*"
-                  style={{ marginLeft: '20px' }}
                 >
                   <Button 
                     icon={<UploadOutlined />} 
@@ -588,7 +611,6 @@ const Profile = () => {
                 </Upload>
               </div>
             </Form.Item>
-            {/* ------------------- END PROFILE IMAGE FIELD ------------------- */}
 
             <Divider orientation="left" style={{ margin: '0 0 24px 0' }}>Basic Info</Divider>
 
@@ -636,7 +658,38 @@ const Profile = () => {
                 prefix={<PhoneOutlined />}
                 placeholder="Enter mobile number"
                 size="large"
-                style={{ color: user.mobile ? "#52c41a" : undefined }}
+              />
+            </Form.Item>
+
+            {/* Date of Birth Field - NEW */}
+            <Form.Item
+              name="dob"
+              label="Date of Birth"
+              rules={[
+                {
+                  validator: async (_, value) => {
+                    if (value) {
+                      const age = new Date().getFullYear() - value.year();
+                      if (age < 18) {
+                        throw new Error("You must be at least 18 years old");
+                      }
+                      if (age > 100) {
+                        throw new Error("Invalid age");
+                      }
+                    }
+                  },
+                },
+              ]}
+            >
+              <DatePicker
+                style={{ width: "100%" }}
+                size="large"
+                format="DD MMM YYYY"
+                placeholder="Select date of birth"
+                disabledDate={(current) => {
+                  return current && current > dayjs().endOf('day');
+                }}
+                suffixIcon={<CalendarOutlined />}
               />
             </Form.Item>
 

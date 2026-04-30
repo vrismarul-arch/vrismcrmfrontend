@@ -46,8 +46,8 @@ const MobileNavbar = () => {
       label: "Dashboard",
       roles: ["Admin", "Superadmin", "Team Leader"],
     },
-            ,        { key: "/content", label: "Content Dashboard", roles: ["Admin", "Superadmin", "Team Leader", "Employee","Client"], icon: <ScheduleOutlined /> },
-    
+    , { key: "/content", label: "Content Dashboard", roles: ["Admin", "Superadmin", "Team Leader", "Employee", "Client"], icon: <ScheduleOutlined /> },
+
     {
       key: "/attendance",
       icon: iconMap.timesheet,
@@ -112,7 +112,7 @@ const MobileNavbar = () => {
           <div className="tab-icon-wrapper">
             {item.icon}
           </div>
-          <span className="tab-label">{item.label}</span>
+          {/* <span className="tab-label">{item.label}</span> */}
           {location.pathname === item.key && <div className="active-indicator" />}
         </div>
       ))}

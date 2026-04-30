@@ -411,7 +411,7 @@ const TaskBoard = () => {
                         }}
                       />
                     </Tooltip>
-                    <Tooltip title="Delete">
+                    {/* <Tooltip title="Delete">
                       <Button
                         type="text"
                         size="small"
@@ -422,7 +422,7 @@ const TaskBoard = () => {
                           showDeleteConfirm(task);
                         }}
                       />
-                    </Tooltip>
+                    </Tooltip> */}
                   </>
                 )}
               </div>
@@ -434,47 +434,7 @@ const TaskBoard = () => {
   );
 
   /* ================= RENDER STATS CARDS ================= */
-  const renderStats = () => (
-    <Row gutter={16} style={{ marginBottom: 16 }}>
-      <Col span={4}>
-        <Card size="small" style={{ textAlign: "center", background: "#f0f5ff" }}>
-          <Text type="secondary">Total</Text>
-          <Title level={3} style={{ margin: 0, color: "#1890ff" }}>{getStatistics.total}</Title>
-        </Card>
-      </Col>
-      <Col span={4}>
-        <Card size="small" style={{ textAlign: "center", background: "#fff7e6" }}>
-          <Text type="secondary">To Do</Text>
-          <Title level={3} style={{ margin: 0, color: "#fa8c16" }}>{getStatistics.todo}</Title>
-        </Card>
-      </Col>
-      <Col span={4}>
-        <Card size="small" style={{ textAlign: "center", background: "#e6f7ff" }}>
-          <Text type="secondary">In Progress</Text>
-          <Title level={3} style={{ margin: 0, color: "#13c2c2" }}>{getStatistics.inProgress}</Title>
-        </Card>
-      </Col>
-      <Col span={4}>
-        <Card size="small" style={{ textAlign: "center", background: "#f6ffed" }}>
-          <Text type="secondary">Completed</Text>
-          <Title level={3} style={{ margin: 0, color: "#52c41a" }}>{getStatistics.completed}</Title>
-        </Card>
-      </Col>
-      <Col span={4}>
-        <Card size="small" style={{ textAlign: "center", background: "#fff1f0" }}>
-          <Text type="secondary">Overdue</Text>
-          <Title level={3} style={{ margin: 0, color: "#f5222d" }}>{getStatistics.overdue}</Title>
-        </Card>
-      </Col>
-      <Col span={4}>
-        <Card size="small" style={{ textAlign: "center", background: "#f9f0ff" }}>
-          <Text type="secondary">Important</Text>
-          <Title level={3} style={{ margin: 0, color: "#722ed1" }}>{getStatistics.important}</Title>
-        </Card>
-      </Col>
-    </Row>
-  );
-
+ 
   /* ================= RENDER FILTERS ================= */
   const renderFilters = () => (
     <Card size="small" style={{ marginBottom: 16, background: "#fafafa" }}>
@@ -597,7 +557,6 @@ const TaskBoard = () => {
       </div>
 
       {/* Statistics */}
-      {renderStats()}
 
       {/* Filters */}
       {renderFilters()}
