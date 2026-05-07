@@ -303,7 +303,7 @@ const Profile = () => {
   const userAge = calculateAge(user.dob);
 
   return (
-    <div style={{ minHeight: "100vh", padding: "40px 20px", background: "#f5f5f5" }}>
+    <div style={{ minHeight: "100vh", background: "#f5f5f5" }}>
       <div style={{ maxWidth: "800px", margin: "0 auto" }}>
         
         {/* Birthday Banner */}

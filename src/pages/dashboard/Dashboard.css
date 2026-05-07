@@ -86,9 +86,7 @@
   border-top-right-radius: 12px;
 }
 
-.ant-card-body {
-  padding: 24px; /* Standard padding for card content */
-}
+
 
 /* Specific styles for chart cards */
 .ant-card.chart-card .chart-wrapper {

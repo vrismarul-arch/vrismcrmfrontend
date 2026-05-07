@@ -3,14 +3,15 @@ import {
   Card, Table, Tag, Progress, Space, Spin, Alert, Empty,
   Button, Row, Col, Statistic, Modal, Typography,
   Divider, message, Select, Badge, Tooltip,
-  Avatar, List, Drawer, Steps, Tabs
+  Avatar, List, Drawer, Steps, Tabs, Descriptions
 } from "antd";
 import {
   RiseOutlined, InstagramOutlined,
   VideoCameraOutlined, EyeOutlined, FileTextOutlined,
   BarChartOutlined, FlagOutlined, FilterOutlined,
   CheckCircleOutlined, TrophyOutlined,
-  CalendarOutlined, CloseOutlined, LinkOutlined
+  CalendarOutlined, CloseOutlined, LinkOutlined,
+  ShopOutlined, DollarOutlined, ClockCircleOutlined
 } from "@ant-design/icons";
 import {
   BarChart,
@@ -40,6 +41,7 @@ const ClientReportPage = () => {
   const [currentTourStep, setCurrentTourStep] = useState(0);
   const [tourPosition, setTourPosition] = useState({ top: 0, left: 0, position: 'bottom' });
   const [activeTab, setActiveTab] = useState("weeks");
+  const [tourAutoStarted, setTourAutoStarted] = useState(false);
   
   const tourCardRef = useRef(null);
   const stepRefs = useRef({});
@@ -247,28 +249,6 @@ const ClientReportPage = () => {
     }, 200);
   };
 
-  useEffect(() => {
-    if (!hasSeenTour && !loading && filteredReports.length > 0) {
-      const timer = setTimeout(() => {
-        startTour();
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [hasSeenTour, loading, filteredReports]);
-
-  useEffect(() => {
-    if (tourActive) {
-      updateTourPosition();
-      window.addEventListener('scroll', updateTourPosition);
-      window.addEventListener('resize', updateTourPosition);
-      
-      return () => {
-        window.removeEventListener('scroll', updateTourPosition);
-        window.removeEventListener('resize', updateTourPosition);
-      };
-    }
-  }, [tourActive, currentTourStep]);
-
   // Normalize function - FIXED to handle API response correctly
   const normalizeReport = (r) => {
     // Process weeks and collect all posts/reels
@@ -280,7 +260,7 @@ const ClientReportPage = () => {
       const weekPosts = week.posted?.posts || [];
       const weekReels = week.posted?.reelsList || [];
       
-      // Format posts for display (static type)
+      // Format posts for display
       const formattedPosts = weekPosts.map(p => ({
         title: p.title || 'Untitled Post',
         link: p.link || '',
@@ -290,14 +270,14 @@ const ClientReportPage = () => {
         id: p.id || p._id
       }));
       
-      // Format reels for display - handle both 'reel' and 'reels' type
-      const formattedReels = weekReels.map(r => ({
-        title: r.title || 'Untitled Reel',
-        link: r.link || '',
-        description: r.description || '',
-        postedDate: r.postedDate,
+      // Format reels for display
+      const formattedReels = weekReels.map(reel => ({
+        title: reel.title || 'Untitled Reel',
+        link: reel.link || '',
+        description: reel.description || '',
+        postedDate: reel.postedDate,
         type: 'reels',
-        id: r.id || r._id
+        id: reel.id || reel._id
       }));
       
       // Add to all collections
@@ -329,6 +309,30 @@ const ClientReportPage = () => {
       (r.totalPosted?.total > 0 && r.totalTarget?.total > 0 ? 
         (r.totalPosted.total / r.totalTarget.total) * 100 : 0);
     
+    // Use allPosts and allReels from API if available, otherwise use collected ones
+    const finalAllPosts = r.allPosts || allPosts;
+    const finalAllReels = r.allReels || allReels;
+    
+    // Process service details
+    const serviceDetails = r.serviceDetails || {};
+    const services = r.services || [];
+    
+    // Create a formatted service details object
+    const formattedServiceDetails = Object.keys(serviceDetails).map(serviceId => {
+      const service = services.find(s => s._id === serviceId);
+      const details = serviceDetails[serviceId];
+      return {
+        serviceId,
+        serviceName: service?.serviceName || 'Unknown Service',
+        status: details?.status || 'N/A',
+        lifecycleStatus: details?.lifecycleStatus || 'N/A',
+        price: details?.price || 0,
+        notes: details?.notes || '',
+        gstRate: service?.gstRate || 0,
+        isActive: service?.isActive || false
+      };
+    });
+    
     return {
       ...r,
       _id: r._id,
@@ -340,10 +344,12 @@ const ClientReportPage = () => {
       deliveredReels: r.totalPosted?.reels || 0,
       completionPercentage: Number(overallPercent.toFixed(2)),
       weeks: processedWeeks,
-      allPosts: allPosts,
-      allReels: allReels,
-      postsCount: allPosts.length,
-      reelsCount: allReels.length
+      allPosts: finalAllPosts,
+      allReels: finalAllReels,
+      postsCount: finalAllPosts.length,
+      reelsCount: finalAllReels.length,
+      serviceDetails: formattedServiceDetails,
+      businessAccount: r.businessAccount
     };
   };
 
@@ -353,11 +359,13 @@ const ClientReportPage = () => {
       const businessId = getBusinessId();
       const res = await api.get(`/api/reports/client/${businessId}`);
       const data = res.data?.data || [];
+      console.log("Raw API data:", data); // Debug log
       const normalized = data.map(normalizeReport);
+      console.log("Normalized reports:", normalized); // Debug log
       setReports(normalized);
       setFilteredReports(normalized);
     } catch (err) {
-      console.log(err);
+      console.error("Error fetching reports:", err);
       message.error("Failed to load reports");
     } finally {
       setLoading(false);
@@ -381,6 +389,30 @@ const ClientReportPage = () => {
     
     setFilteredReports(filtered);
   }, [filterMonth, filterYear, reports]);
+
+  // Auto-start tour when data is loaded and user hasn't seen it
+  useEffect(() => {
+    if (!hasSeenTour && !loading && filteredReports.length > 0 && !tourActive && !tourAutoStarted) {
+      setTourAutoStarted(true);
+      const timer = setTimeout(() => {
+        startTour();
+      }, 1500); // Increased delay to ensure DOM is ready
+      return () => clearTimeout(timer);
+    }
+  }, [hasSeenTour, loading, filteredReports, tourActive, tourAutoStarted]);
+
+  useEffect(() => {
+    if (tourActive) {
+      updateTourPosition();
+      window.addEventListener('scroll', updateTourPosition);
+      window.addEventListener('resize', updateTourPosition);
+      
+      return () => {
+        window.removeEventListener('scroll', updateTourPosition);
+        window.removeEventListener('resize', updateTourPosition);
+      };
+    }
+  }, [tourActive, currentTourStep]);
 
   const getStatistics = () => {
     const totalPosts = filteredReports.reduce((sum, r) => sum + (r.deliveredStatic || 0), 0);
@@ -478,6 +510,33 @@ const ClientReportPage = () => {
         return {};
     }
   };
+
+  // Add CSS for tour highlight animation
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      
+      .tour-highlight {
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 999;
+      }
+    `;
+    document.head.appendChild(style);
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
 
   if (loading) return (
     <div style={{ padding: 20, textAlign: 'center' }}>
@@ -598,21 +657,6 @@ const ClientReportPage = () => {
         </div>
       )}
       
-      <style>
-        {`
-          @keyframes fadeIn {
-            from {
-              opacity: 0;
-              transform: translateY(-10px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0);
-            }
-          }
-        `}
-      </style>
-      
       {/* Header */}
       <div className="reports-header" style={{ 
         marginBottom: 24, 
@@ -635,7 +679,10 @@ const ClientReportPage = () => {
           <Button 
             type={!hasSeenTour ? "primary" : "default"}
             icon={<FlagOutlined />} 
-            onClick={startTour}
+            onClick={() => {
+              setTourAutoStarted(true);
+              startTour();
+            }}
             style={{ marginTop: isMobile ? 12 : 0 }}
           >
             {hasSeenTour ? "Help & Tour" : "Start Tour"}
@@ -977,7 +1024,7 @@ const ClientReportPage = () => {
                           </Col>
                         </Row>
 
-                        {/* Reels List - Display reels first since that's what you have */}
+                        {/* Reels List */}
                         {week.reelsList && week.reelsList.length > 0 && (
                           <>
                             <Divider orientation="left" style={{ margin: '16px 0 12px' }}>
@@ -1097,7 +1144,7 @@ const ClientReportPage = () => {
                 )}
               </TabPane>
 
-              {/* All Reels Tab - Show first since you have reels */}
+              {/* All Reels Tab */}
               <TabPane 
                 tab={<span><VideoCameraOutlined /> All Reels ({selectedReport.allReels?.length || 0})</span>} 
                 key="reels"
@@ -1192,6 +1239,97 @@ const ClientReportPage = () => {
                   />
                 ) : (
                   <Empty description="No posts found for this report" />
+                )}
+              </TabPane>
+
+              {/* Service Details Tab - NEW */}
+              <TabPane 
+                tab={<span><ShopOutlined /> Service Details</span>} 
+                key="services"
+              >
+                {selectedReport.serviceDetails && selectedReport.serviceDetails.length > 0 ? (
+                  <>
+                    {/* Business Information */}
+                    {selectedReport.businessAccount && (
+                      <Card size="small" style={{ marginBottom: 16, borderRadius: 8, background: '#f0f7ff' }}>
+                        <Descriptions title="Business Information" column={{ xs: 1, sm: 2 }} size="small">
+                          <Descriptions.Item label="Business Name">
+                            <Text strong>{selectedReport.businessAccount.businessName || 'N/A'}</Text>
+                          </Descriptions.Item>
+                          <Descriptions.Item label="Report Period">
+                            {selectedReport.month} {selectedReport.year}
+                          </Descriptions.Item>
+                        </Descriptions>
+                      </Card>
+                    )}
+
+                    {/* Service Details */}
+                    {selectedReport.serviceDetails.map((service, idx) => (
+                      <Card 
+                        key={idx}
+                        size="small"
+                        style={{ marginBottom: 16, borderRadius: 8 }}
+                        title={
+                          <Space>
+                            <ShopOutlined style={{ color: '#1890ff' }} />
+                            <Text strong>{service.serviceName}</Text>
+                            <Tag color={service.isActive ? "green" : "red"}>
+                              {service.isActive ? "Active" : "Inactive"}
+                            </Tag>
+                          </Space>
+                        }
+                      >
+                        <Descriptions column={{ xs: 1, sm: 2 }} size="small" bordered>
+                          <Descriptions.Item label="Status">
+                            <Badge 
+                              status={service.status === 'completed' ? 'success' : service.status === 'in-progress' ? 'processing' : 'default'}
+                              text={service.status || 'N/A'}
+                            />
+                          </Descriptions.Item>
+                          <Descriptions.Item label="Lifecycle Status">
+                            <Tag color={
+                              service.lifecycleStatus === 'live' ? 'green' : 
+                              service.lifecycleStatus === 'paused' ? 'orange' : 
+                              'default'
+                            }>
+                              {service.lifecycleStatus || 'N/A'}
+                            </Tag>
+                          </Descriptions.Item>
+                          
+                          
+                         
+                          {service.notes && (
+                            <Descriptions.Item label="Notes" span={2}>
+                              <Paragraph style={{ marginBottom: 0, background: '#fafafa', padding: 8, borderRadius: 4 }}>
+                                {service.notes}
+                              </Paragraph>
+                            </Descriptions.Item>
+                          )}
+                        </Descriptions>
+                      </Card>
+                    ))}
+
+                    {/* Summary Card */}
+                    <Card size="small" style={{ borderRadius: 8, background: '#f6ffed', borderColor: '#b7eb8f' }}>
+                      <div style={{ textAlign: 'center' }}>
+                        <Text type="secondary">Total Services: {selectedReport.serviceDetails.length}</Text>
+                        <Divider style={{ margin: '12px 0' }} />
+                        <Text strong style={{ fontSize: 14 }}>
+                          Total Investment: ₹
+                          {selectedReport.serviceDetails.reduce((sum, s) => 
+                            sum + ((s.price || 0) * (1 + (s.gstRate || 0) / 100)), 0
+                          ).toLocaleString()}
+                        </Text>
+                      </div>
+                    </Card>
+                  </>
+                ) : (
+                  <Empty 
+                    description="No service details available for this report" 
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                  >
+                    <Text type="secondary">Service information will appear here when available</Text>
+                  </Empty>
                 )}
               </TabPane>
             </Tabs>

@@ -1,3 +1,5 @@
+/* WeeklyReportManager.css - Responsive Version */
+
 /* ─── Design Tokens ─────────────────────────────────────────── */
 :root {
   --gray-50:  #F9F9F8;
@@ -190,6 +192,7 @@ border-radius: 19px;
   border: 0.5px solid var(--gray-200);
   border-radius: var(--radius-lg);
   overflow: hidden;
+  overflow-x: auto;
 }
 
 /* ─── Table Row Hover ────────────────────────────────────────── */
@@ -463,4 +466,753 @@ border-radius: 19px;
 /* ─── Ant Design Overrides ───────────────────────────────────── */
 .wrm-table .ant-table-summary td {
   background: var(--gray-50) !important;
+}
+
+/* ============================================================== */
+/* RESPONSIVE STYLES - Mobile & Tablet Friendly                  */
+/* ============================================================== */
+
+/* Tablet Styles (max-width: 1024px) */
+@media (max-width: 1024px) {
+  .wrm-page {
+    padding: 14px;
+  }
+
+  .wrm-metric-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .wrm-metric__value1 {
+    font-size: 48px;
+  }
+
+  .wrm-metric__done,
+  .wrm-metric__pending {
+    font-size: 18px;
+    padding: 8px 12px;
+  }
+}
+
+/* Mobile Landscape & Small Tablet (max-width: 768px) */
+@media (max-width: 768px) {
+  .wrm-page {
+    padding: 12px;
+  }
+
+  .wrm-page-header {
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .wrm-page-header > div:first-child {
+    width: 100%;
+  }
+
+  .wrm-page-title {
+    font-size: 20px !important;
+  }
+
+  .wrm-page-subtitle {
+    font-size: 12px;
+  }
+
+  .wrm-metric-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .wrm-metric {
+    padding: 12px 16px;
+  }
+
+  .wrm-metric__value1 {
+    font-size: 40px;
+  }
+
+  .wrm-metric__done,
+  .wrm-metric__pending {
+    font-size: 16px;
+    padding: 6px 10px;
+  }
+
+  /* Filters stacking */
+  .wrm-filters .ant-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .wrm-filters .ant-col {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: none !important;
+  }
+
+  .wrm-filters {
+    padding: 12px;
+  }
+
+  /* Table horizontal scroll is already handled by overflow-x */
+  .wrm-table-wrap {
+    border-radius: var(--radius-md);
+  }
+
+  /* Drawer adjustments for mobile */
+  .ant-drawer {
+    max-width: 100% !important;
+  }
+
+  .ant-drawer-content-wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .ant-drawer-body {
+    padding: 16px !important;
+  }
+
+  .wrm-drawer-section,
+  .wrm-monthly-strip,
+  .wrm-week-progress-strip {
+    padding: 12px 14px;
+  }
+
+  .wrm-week-progress-pct {
+    font-size: 12px;
+  }
+
+  .wrm-week-stat {
+    padding: 10px 12px;
+  }
+
+  .wrm-week-stat__value {
+    font-size: 18px;
+  }
+
+  .wrm-week-stat__suffix {
+    font-size: 11px;
+  }
+
+  .wrm-posts-header {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .wrm-posts-header .ant-btn {
+    margin-left: auto;
+  }
+
+  /* Drawer actions fixed bottom - adjust for mobile */
+  .wrm-drawer-actions {
+    bottom: 16px;
+    right: 16px;
+    gap: 8px;
+  }
+
+  .wrm-drawer-actions .ant-btn {
+    padding: 4px 12px;
+    font-size: 13px;
+  }
+
+  /* View drawer week items */
+  .wrm-view-week {
+    padding: 10px 12px;
+  }
+
+  .wrm-view-week__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  /* Tab adjustments */
+  .ant-tabs-nav {
+    margin-bottom: 12px !important;
+  }
+
+  .ant-tabs-tab {
+    padding: 8px 12px !important;
+  }
+
+  .wrm-tab-label {
+    font-size: 12px;
+  }
+
+  /* Form items spacing */
+  .ant-form-item {
+    margin-bottom: 16px;
+  }
+}
+
+/* Mobile Portrait (max-width: 480px) */
+@media (max-width: 480px) {
+  .wrm-page {
+    padding: 8px;
+  }
+
+  .wrm-page-header {
+    margin-bottom: 14px;
+  }
+
+  .wrm-page-title {
+    font-size: 18px !important;
+  }
+
+  .wrm-page-subtitle {
+    font-size: 11px;
+  }
+
+  .wrm-metric {
+    padding: 10px 12px;
+  }
+
+  .wrm-metric__label {
+    font-size: 10px;
+    margin-bottom: 4px;
+  }
+
+  .wrm-metric__value {
+    font-size: 22px;
+  }
+
+  .wrm-metric__value1 {
+    font-size: 32px;
+  }
+
+  .wrm-metric__done,
+  .wrm-metric__pending {
+    font-size: 14px;
+    padding: 4px 8px;
+  }
+
+  .wrm-metric__sub {
+    margin-top: 8px;
+    padding-top: 6px;
+  }
+
+  .wrm-filters {
+    padding: 10px;
+    margin-bottom: 14px;
+  }
+
+  /* Table cell padding reduction for small screens */
+  .wrm-table .ant-table-cell {
+    padding: 8px 8px !important;
+  }
+
+  /* Progress circle size */
+  .ant-progress-circle .ant-progress-text {
+    font-size: 10px !important;
+  }
+
+  .ant-progress-circle.ant-progress-status-success .ant-progress-text {
+    font-size: 10px !important;
+  }
+
+  /* Button sizing */
+  .ant-btn {
+    font-size: 12px;
+    padding: 4px 10px;
+  }
+
+  .wrm-btn-primary.ant-btn-primary {
+    font-size: 12px;
+  }
+
+  /* Drawer body padding */
+  .ant-drawer-body {
+    padding: 12px !important;
+  }
+
+  .wrm-drawer-section {
+    padding: 10px 12px;
+    margin-bottom: 14px;
+  }
+
+  .wrm-drawer-actions {
+    bottom: 12px;
+    right: 12px;
+  }
+
+  .wrm-drawer-actions .ant-btn {
+    padding: 4px 10px;
+  }
+
+  /* Monthly strip */
+  .wrm-monthly-strip .ant-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .wrm-monthly-strip .ant-col {
+    width: 100% !important;
+    text-align: center;
+  }
+
+  .wrm-monthly-strip__value {
+    font-size: 18px;
+  }
+
+  /* Week stats row */
+  .wrm-week-panel .ant-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .wrm-week-panel .ant-col {
+    width: 100% !important;
+  }
+
+  /* Progress strip */
+  .wrm-week-progress-strip {
+    padding: 10px 12px;
+  }
+
+  /* Post table column adjustments */
+  .wrm-week-panel .ant-table {
+    font-size: 12px;
+  }
+
+  .wrm-week-panel .ant-table-cell {
+    padding: 6px 8px !important;
+  }
+
+  /* Hide less important columns on very small screens */
+  .wrm-week-panel .ant-table-cell:last-child,
+  .wrm-week-panel .ant-table-cell:nth-last-child(2) {
+    white-space: nowrap;
+  }
+
+  /* Tab label icons spacing */
+  .wrm-tab-label .anticon {
+    margin-left: 4px;
+    font-size: 10px;
+  }
+
+  /* Action buttons in table */
+  .wrm-table .ant-space {
+    gap: 0px !important;
+  }
+
+  .wrm-table .ant-btn-text {
+    padding: 4px 6px;
+  }
+
+  /* Post drawer */
+  .ant-drawer-title {
+    font-size: 14px !important;
+  }
+
+  /* Status pills */
+  .wrm-pill {
+    font-size: 10px;
+    padding: 1px 8px;
+  }
+}
+
+/* Small Mobile (max-width: 375px) */
+@media (max-width: 375px) {
+  .wrm-metric__value1 {
+    font-size: 28px;
+  }
+
+  .wrm-metric__done,
+  .wrm-metric__pending {
+    font-size: 12px;
+    padding: 3px 6px;
+  }
+
+  .wrm-table .ant-table-cell {
+    padding: 6px 4px !important;
+    font-size: 12px;
+  }
+
+  .wrm-progress-cell__fraction {
+    font-size: 11px;
+  }
+
+  .wrm-progress-cell__note {
+    font-size: 9px;
+  }
+
+  .ant-progress-inner {
+    width: 100% !important;
+  }
+
+  .ant-progress-circle {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  .ant-progress-circle .ant-progress-text {
+    font-size: 9px !important;
+  }
+}
+
+/* Touch-friendly adjustments for mobile */
+@media (max-width: 768px) {
+  .ant-btn,
+  .ant-select-selector,
+  .ant-picker,
+  .ant-input-number,
+  .ant-input {
+    min-height: 36px;
+  }
+
+  .ant-table-tbody > tr > td {
+    cursor: pointer;
+  }
+
+  /* Better spacing for touch targets */
+  .ant-table-cell .ant-space-item .ant-btn {
+    min-width: 28px;
+    min-height: 28px;
+  }
+
+  /* Scrollable drawer content */
+  .ant-drawer-body {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Improved select dropdown on mobile */
+  .ant-select-dropdown {
+    max-height: 60vh;
+  }
+}
+
+/* Landscape orientation adjustments */
+@media (max-width: 896px) and (orientation: landscape) {
+  .wrm-page {
+    padding: 10px;
+  }
+
+  .wrm-metric-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .ant-drawer-content-wrapper {
+    width: 85% !important;
+  }
+
+  .wrm-drawer-actions {
+    bottom: 12px;
+    right: 12px;
+  }
+}
+
+/* High resolution screens - better spacing */
+@media (min-width: 1440px) {
+  .wrm-page {
+    padding: 24px;
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+
+  .wrm-metric-grid {
+    gap: 16px;
+  }
+
+  .wrm-metric {
+    padding: 20px 24px;
+  }
+
+  .wrm-metric__value1 {
+    font-size: 96px;
+  }
+}
+
+/* Print styles - optional */
+@media print {
+  .wrm-page {
+    padding: 0;
+  }
+
+  .wrm-page-header .ant-btn,
+  .wrm-filters,
+  .wrm-drawer-actions,
+  .ant-drawer,
+  .ant-popover,
+  .ant-table-cell .ant-btn {
+    display: none !important;
+  }
+
+  .wrm-table-wrap {
+    overflow: visible !important;
+  }
+
+  .wrm-table .ant-table {
+    font-size: 10pt;
+  }
+}/* ============================================================== */
+/* RESPONSIVE STYLES - Mobile Table to Card Conversion           */
+/* ============================================================== */
+
+/* Mobile Card Styles (shows on screens <= 768px) */
+.wrm-mobile-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 4px 0;
+}
+
+.wrm-mobile-card {
+  border-radius: var(--radius-lg) !important;
+  border: 0.5px solid var(--gray-200) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.wrm-mobile-card .ant-card-body {
+  padding: 16px;
+}
+
+.wrm-mobile-card .ant-card-actions {
+  background: var(--gray-50);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  border-top: 0.5px solid var(--gray-200);
+}
+
+.wrm-mobile-card .ant-card-actions > li {
+  margin: 8px 0;
+}
+
+.wrm-mobile-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.wrm-mobile-account {
+  margin: 0 !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  color: var(--gray-900) !important;
+}
+
+.wrm-mobile-date {
+  font-size: 12px;
+  color: var(--gray-400);
+  margin-top: 4px;
+}
+
+.wrm-mobile-status-tag {
+  border-radius: 20px;
+  font-size: 12px;
+  padding: 2px 10px;
+}
+
+.wrm-mobile-progress-circle {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.wrm-mobile-progress-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray-900);
+}
+
+.wrm-mobile-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.wrm-mobile-stat-item {
+  background: var(--gray-50);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+}
+
+.wrm-mobile-stat-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--gray-600);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.wrm-mobile-stat-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.wrm-mobile-stat-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray-900);
+}
+
+.wrm-mobile-pagination {
+  text-align: center;
+  padding: 16px;
+  color: var(--gray-400);
+  font-size: 13px;
+  border-top: 0.5px solid var(--gray-200);
+  margin-top: 8px;
+}
+
+.wrm-empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--gray-400);
+  background: #fff;
+  border-radius: var(--radius-lg);
+  border: 0.5px solid var(--gray-200);
+}
+
+/* Table container for desktop */
+.wrm-reports-container {
+  width: 100%;
+}
+
+/* Responsive Drawer Widths */
+@media (max-width: 768px) {
+  .ant-drawer-content-wrapper {
+    width: 100% !important;
+  }
+  
+  .ant-drawer-body {
+    padding: 16px !important;
+  }
+}
+
+/* Responsive Filters */
+@media (max-width: 768px) {
+  .wrm-filters {
+    padding: 12px;
+  }
+}
+
+/* Responsive Metric Grid */
+@media (max-width: 768px) {
+  .wrm-metric-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  
+  .wrm-metric__value1 {
+    font-size: 48px;
+  }
+  
+  .wrm-metric__done,
+  .wrm-metric__pending {
+    font-size: 16px;
+    padding: 6px 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .wrm-metric-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .wrm-metric__value1 {
+    font-size: 40px;
+  }
+}
+
+/* Responsive Weekly Stats in Drawer */
+@media (max-width: 768px) {
+  .wrm-week-panel .ant-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .wrm-week-panel .ant-col {
+    width: 100% !important;
+  }
+  
+  .wrm-week-stat {
+    margin-bottom: 0;
+  }
+  
+  .wrm-posts-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .wrm-posts-header .ant-btn {
+    width: 100%;
+  }
+  
+  /* Make post table scrollable on mobile */
+  .wrm-week-panel .ant-table-wrapper {
+    overflow-x: auto;
+  }
+  
+  .wrm-week-panel .ant-table {
+    min-width: 500px;
+  }
+}
+
+/* Responsive Monthly Strip */
+@media (max-width: 768px) {
+  .wrm-monthly-strip .ant-row {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+  }
+  
+  .wrm-monthly-strip .ant-col {
+    width: 100% !important;
+  }
+}
+
+/* Responsive View Drawer */
+@media (max-width: 768px) {
+  .wrm-view-week__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .wrm-view-week .ant-table-wrapper {
+    overflow-x: auto;
+  }
+  
+  .wrm-view-week .ant-table {
+    min-width: 500px;
+  }
+}
+
+/* Touch-friendly tap targets */
+@media (max-width: 768px) {
+  .ant-btn,
+  .ant-select-selector,
+  .ant-picker,
+  .ant-input-number,
+  .ant-input,
+  .ant-table-cell .ant-btn {
+    min-height: 40px;
+  }
+  
+  .ant-table-cell .ant-btn {
+    min-width: 36px;
+  }
+  
+  .ant-pagination-item {
+    min-width: 36px;
+    height: 36px;
+    line-height: 34px;
+  }
+}
+
+/* Landscape mode adjustments */
+@media (max-width: 896px) and (orientation: landscape) {
+  .wrm-metric-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  .wrm-metric__value1 {
+    font-size: 32px;
+  }
 }
